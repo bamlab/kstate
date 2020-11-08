@@ -1,9 +1,10 @@
 plugins {
     kotlin("multiplatform") version "1.3.72"
+    `maven-publish`
 }
 
-group = "xyz.pucci"
-version = "1.0-SNAPSHOT"
+group = "com.tpucci"
+version = "0.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -30,6 +31,28 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 implementation("org.jetbrains.kotlin:kotlin-test-junit")
+            }
+        }
+    }
+
+    configure(listOf(targets["metadata"], jvm())) {
+        mavenPublication {
+            val targetPublication = this@mavenPublication
+            tasks.withType<AbstractPublishToMaven>()
+                    .matching { it.publication == targetPublication }
+                    .all { onlyIf { findProperty("isMainHost") == "true" } }
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/tpucci/kstate")
+            credentials {
+                username = System.getenv("USERNAME")
+                password = System.getenv("TOKEN")
             }
         }
     }
