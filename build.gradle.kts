@@ -44,8 +44,8 @@ kotlin {
 }
 
 bintray {
-    user = System.getProperty("BINTRAY_USER")
-    key = System.getProperty("BINTRAY_API_KEY")
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_API_KEY")
     publish = true
     setPublications("jvm")
 
