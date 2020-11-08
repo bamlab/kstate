@@ -25,11 +25,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Build with Gradle
-        run: gradle build
+      - name: Setup version
+        run: sed -i -E "s/0.0.0-development/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
 
-      - name: Publish to GitHub Packages
-        run: gradle publish
+      - name: Publish to Bintray
+        run: gradle bintrayUpload
         env:
-          USERNAME: ${{ github.actor }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_API_KEY: ${{ secrets.BINTRAY_API_KEY }}

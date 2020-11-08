@@ -1,19 +1,17 @@
 plugins {
     kotlin("multiplatform") version "1.3.72"
     `maven-publish`
+    id("com.jfrog.bintray") version "1.8.5"
 }
 
-group = "com.tpucci"
-version = "0.0.0-SNAPSHOT"
+group = "com.github.tpucci"
+version = "0.0.0-development"
 
 repositories {
     mavenCentral()
 }
 
 kotlin {
-    /* Targets configuration omitted. 
-    *  To find out how to configure the targets, please follow the link:
-    *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
     jvm()
 
     sourceSets {
@@ -45,15 +43,23 @@ kotlin {
     }
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/tpucci/kstate")
-            credentials {
-                username = System.getenv("USERNAME")
-                password = System.getenv("TOKEN")
-            }
+bintray {
+    user = System.getProperty("BINTRAY_USER")
+    key = System.getProperty("BINTRAY_API_KEY")
+    publish = true
+    setPublications("jvm")
+
+    pkg.apply {
+        repo = "kstate"
+        name = "kstate"
+        userOrg = "tpucci"
+        setLicenses("MIT")
+        vcsUrl = "https://github.com/tpucci/kstate.git"
+        version.apply {
+            name = rootProject.version.toString()
+            desc = rootProject.version.toString()
+            vcsTag = rootProject.version.toString()
         }
     }
+
 }

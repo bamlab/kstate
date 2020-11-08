@@ -1,4 +1,4 @@
-package xyz.pucci.kstate
+package com.github.tpucci
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
