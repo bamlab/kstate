@@ -32,11 +32,17 @@ jobs:
 
       - name: Setup version
         run: sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
+        if: github.event.ref_type != 'tag'
 
-      - name: Publish to Bintray
+      - name: Setup version for release
+        run: sed -i -E "s/0.0.0-SNAPSHOT/$(git describe --abbrev=0 --tags --always --first-parent)/" ./build.gradle.kts
+        if: github.event.ref_type == 'tag'
+
+      - name: Publish
         run: gradle publish
         env:
           ORG_GRADLE_PROJECT_signingKeyId: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEYID }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME }}
+          ORG_GRADLE_PROJECT_isReleaseBuild: ${{ github.event.ref_type != 'tag' }}
