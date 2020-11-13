@@ -1,7 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.3.72"
     `maven-publish`
-    id("com.jfrog.bintray") version "1.8.5"
 }
 
 group = "com.github.tpucci"
@@ -39,27 +38,51 @@ kotlin {
             tasks.withType<AbstractPublishToMaven>()
                     .matching { it.publication == targetPublication }
                     .all { onlyIf { findProperty("isMainHost") == "true" } }
+
+            pom {
+                name.set("kstate")
+                description.set("A Kotlin Multiplatform library for creating state machines")
+                url.set("https://github.com/tpucci/kstate")
+
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://opensource.org/licenses/MIT")
+                        distribution.set("repo")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("tpucci")
+                        name.set("Thomas Pucci")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/tpucci/kstate")
+                    connection.set("scm:git:https://github.com/tpucci/kstate")
+                }
+            }
         }
     }
 }
 
-bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_API_KEY")
-    publish = true
-    setPublications("jvm")
-
-    pkg.apply {
-        repo = "kstate"
-        name = "kstate"
-        userOrg = "tpucci"
-        setLicenses("MIT")
-        vcsUrl = "https://github.com/tpucci/kstate.git"
-        version.apply {
-            name = rootProject.version.toString()
-            desc = rootProject.version.toString()
-            vcsTag = rootProject.version.toString()
+publishing {
+    repositories {
+        maven {
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+            credentials {
+                username = properties["sonatypeUsername"].toString()
+                password = properties["sonatypePassword"].toString()
+            }
         }
     }
 
+    extensions.findByType<SigningExtension>()?.apply {
+        val publishing = extensions.findByType<PublishingExtension>() ?: return@apply
+        val key = properties["signingKeyId"]?.toString()?.replace("\\n", "\n")
+        val password = properties["signingPassword"]?.toString()
+
+        useInMemoryPgpKeys(key, password)
+        sign(publishing.publications)
+    }
 }
