@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.github.tpucci"
-version = "0.0.0-development"
+version = "0.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()

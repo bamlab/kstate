@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Setup version
-        run: sed -i -E "s/0.0.0-development/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
+        run: sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
 
       - name: Publish to Bintray
         run: gradle publish
