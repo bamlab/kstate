@@ -69,12 +69,22 @@ kotlin {
 publishing {
     repositories {
         maven {
-            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+            url = uri(
+                if (isReleaseBuild) {
+                    "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                } else {
+                    "https://oss.sonatype.org/content/repositories/snapshots"
+                }
+            )
             credentials {
                 username = properties["sonatypeUsername"].toString()
                 password = properties["sonatypePassword"].toString()
             }
         }
+    }
+
+    tasks.withType<Sign>().configureEach {
+        onlyIf { isReleaseBuild }
     }
 
     extensions.findByType<SigningExtension>()?.apply {
@@ -86,3 +96,6 @@ publishing {
         sign(publishing.publications)
     }
 }
+
+val isReleaseBuild: Boolean
+    get() = (properties["isReleaseBuild"] == "true")
