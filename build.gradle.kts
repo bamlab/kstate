@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform") version "1.3.72"
     `maven-publish`
+    signing
 }
 
 group = "com.github.tpucci"
@@ -89,7 +90,7 @@ publishing {
 
     extensions.findByType<SigningExtension>()?.apply {
         val publishing = extensions.findByType<PublishingExtension>() ?: return@apply
-        val key = properties["signingKeyId"]?.toString()?.replace("\\n", "\n")
+        val key = properties["signingKey"]?.toString()?.replace("\\n", "\n")
         val password = properties["signingPassword"]?.toString()
 
         useInMemoryPgpKeys(key, password)
