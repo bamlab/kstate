@@ -32,11 +32,15 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Setup version
-        run: sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
+        run: |
+          sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
+          git describe --abbrev=7 --tags --always --first-parent
         if: github.event.ref_type != 'tag'
 
       - name: Setup version for release
-        run: sed -i -E "s/0.0.0-SNAPSHOT/$(git describe --abbrev=0 --tags --always --first-parent)/" ./build.gradle.kts
+        run: |
+          sed -i -E "s/0.0.0-SNAPSHOT/$(git describe --abbrev=0)/" ./build.gradle.kts
+          git describe --abbrev=0
         if: github.event.ref_type == 'tag'
 
       - name: Publish

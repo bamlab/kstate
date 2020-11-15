@@ -35,10 +35,7 @@ kotlin {
 
     configure(listOf(targets["metadata"], jvm())) {
         mavenPublication {
-            val targetPublication = this@mavenPublication
-            tasks.withType<AbstractPublishToMaven>()
-                    .matching { it.publication == targetPublication }
-                    .all { onlyIf { findProperty("isMainHost") == "true" } }
+            artifact(emptyJavadocJar.get())
 
             pom {
                 name.set("kstate")
@@ -100,3 +97,7 @@ publishing {
 
 val isReleaseBuild: Boolean
     get() = (properties["isReleaseBuild"] == "true")
+
+val emptyJavadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+}
