@@ -1,6 +1,10 @@
+import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+
 plugins {
     kotlin("multiplatform") version "1.3.72"
     `maven-publish`
+    id("org.jetbrains.dokka") version "0.10.1"
     signing
 }
 
@@ -9,6 +13,10 @@ version = "0.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+}
+
+val emptyJavadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
 }
 
 kotlin {
@@ -32,9 +40,27 @@ kotlin {
             }
         }
     }
+}
 
-    configure(listOf(targets["metadata"], jvm())) {
-        mavenPublication {
+afterEvaluate {
+    extensions.findByType<PublishingExtension>()?.apply {
+        repositories {
+            maven {
+                url = uri(
+                    if (isReleaseBuild) {
+                        "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    } else {
+                        "https://oss.sonatype.org/content/repositories/snapshots"
+                    }
+                )
+                credentials {
+                    username = properties["sonatypeUsername"].toString()
+                    password = properties["sonatypePassword"].toString()
+                }
+            }
+        }
+
+        publications.withType<MavenPublication>().configureEach {
             artifact(emptyJavadocJar.get())
 
             pom {
@@ -61,43 +87,28 @@ kotlin {
                 }
             }
         }
-    }
-}
 
-publishing {
-    repositories {
-        maven {
-            url = uri(
-                if (isReleaseBuild) {
-                    "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                } else {
-                    "https://oss.sonatype.org/content/repositories/snapshots"
-                }
-            )
-            credentials {
-                username = properties["sonatypeUsername"].toString()
-                password = properties["sonatypePassword"].toString()
-            }
+        tasks.withType<Sign>().configureEach {
+            onlyIf { isReleaseBuild }
+        }
+
+        extensions.findByType<SigningExtension>()?.apply {
+            val publishing = extensions.findByType<PublishingExtension>() ?: return@apply
+            val key = properties["signingKey"]?.toString()?.replace("\\n", "\n")
+            val password = properties["signingPassword"]?.toString()
+
+            useInMemoryPgpKeys(key, password)
+            sign(publishing.publications)
         }
     }
 
-    tasks.withType<Sign>().configureEach {
-        onlyIf { isReleaseBuild }
-    }
-
-    extensions.findByType<SigningExtension>()?.apply {
-        val publishing = extensions.findByType<PublishingExtension>() ?: return@apply
-        val key = properties["signingKey"]?.toString()?.replace("\\n", "\n")
-        val password = properties["signingPassword"]?.toString()
-
-        useInMemoryPgpKeys(key, password)
-        sign(publishing.publications)
+    tasks.withType(DokkaTask::class.java) {
+        multiplatform {
+            extensions.findByType<KotlinMultiplatformExtension>()?.targets?.forEach { create(it.name) }
+        }
     }
 }
+
 
 val isReleaseBuild: Boolean
     get() = (properties["isReleaseBuild"] == "true")
-
-val emptyJavadocJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("javadoc")
-}
