@@ -1,4 +1,4 @@
-name: JVM Continuous Deployment
+name: JVM Release
 
 on:
   push:
@@ -32,8 +32,8 @@ jobs:
 
       - name: Setup version for release
         run: |
-          sed -i -E "s/0.0.0-SNAPSHOT/$(git describe --abbrev=0)/" ./build.gradle.kts
-          git describe --abbrev=0
+          sed -i -E "s/0.0.0-SNAPSHOT/$(git describe --abbrev=0 --tags)/" ./build.gradle.kts
+          git describe --abbrev=0 --tags
 
       - name: Publish
         run: gradle publish
