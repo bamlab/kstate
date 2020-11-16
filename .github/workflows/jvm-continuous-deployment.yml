@@ -35,6 +35,9 @@ jobs:
         run: |
           sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
           git describe --abbrev=7 --tags --always --first-parent
+          echo $REF
+        env:
+          REF: ${{ github.event.ref_type }}
         if: github.event.ref_type != 'tag'
 
       - name: Setup version for release
