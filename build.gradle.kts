@@ -5,6 +5,7 @@ plugins {
     kotlin("multiplatform") version "1.3.72"
     `maven-publish`
     id("org.jetbrains.dokka") version "0.10.1"
+    id("io.codearte.nexus-staging") version "0.22.0"
     signing
 }
 
@@ -107,6 +108,11 @@ afterEvaluate {
             extensions.findByType<KotlinMultiplatformExtension>()?.targets?.forEach { create(it.name) }
         }
     }
+}
+
+nexusStaging {
+    username = properties["sonatypeUsername"].toString()
+    password = properties["sonatypePassword"].toString()
 }
 
 
