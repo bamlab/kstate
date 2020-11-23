@@ -26,7 +26,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(kotlin("stdlib-common"))
+                implementation(kotlin("stdlib"))
             }
         }
         val commonTest by getting {
@@ -37,6 +37,7 @@ kotlin {
         }
         val jvmTest by getting {
             dependencies {
+                implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlin:kotlin-test-junit")
             }
         }
