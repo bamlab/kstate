@@ -126,12 +126,9 @@ tasks.withType<DokkaTask>().configureEach {
                 remoteUrl.set(URL("https://github.com/tpucci/kstate/blob/master/src/commonMain/kotlin"))
                 remoteLineSuffix.set("#L")
             }
-//            externalDocumentationLink {
-//                url.set(URL("https://tpucci.github.io/kstate/kstate"))
-//            }
+            externalDocumentationLink {
+                url.set(URL("https://tpucci.github.io/kstate/kstate/"))
+            }
         }
-
-
-
     }
 }
