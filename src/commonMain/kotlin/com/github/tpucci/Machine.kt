@@ -1,29 +1,51 @@
 package com.github.tpucci
 
-interface Machine<STATE> {
+import com.github.tpucci.MachineBuilder.Companion.machine
+
+/** The interface returned by [machine]. */
+interface Machine<STATE, EVENT> {
+  /** List of possible states. */
   val states: List<STATE>
+  /** List of accepted events. */
+  val events: List<EVENT>
 }
 
-class MachineBuilder<STATE> private constructor() : Machine<STATE> {
+/**
+ * Main class to build a state machine. Use companion object function [machine] to create a state
+ * [Machine] instance.
+ */
+class MachineBuilder<STATE, EVENT> private constructor() : Machine<STATE, EVENT> {
 
-  private val statesMap = mutableMapOf<STATE, Unit>()
+  private val statesMap = mutableMapOf<STATE, StateBuilder<out STATE, EVENT>>()
 
   override val states: List<STATE>
     get() = statesMap.keys.toList()
 
-  fun <S : STATE> state(state: S, init: StateBuilder<S>.() -> Unit) {
-    val (k, v) = StateBuilder<S>(state).apply(init).build()
+  override val events: List<EVENT>
+    get() = statesMap.values.flatMap { it.events }.distinct()
+
+  fun <S : STATE> state(state: S, init: StateBuilder<S, EVENT>.() -> Unit) {
+    val (k, v) = StateBuilder<S, EVENT>(state).apply(init).build()
     statesMap[k] = v
   }
 
-  fun build() = this as Machine<STATE>
+  fun build() = this as Machine<STATE, EVENT>
 
   companion object {
-    fun <STATE : Any> machine(init: MachineBuilder<STATE>.() -> Unit) =
-        MachineBuilder<STATE>().apply(init).build()
+    fun <STATE : Any, EVENT : Any> machine(init: MachineBuilder<STATE, EVENT>.() -> Unit) =
+        MachineBuilder<STATE, EVENT>().apply(init).build()
   }
 }
 
-class StateBuilder<S>(private val state: S) {
-  fun build() = Pair(state, Unit)
+class StateBuilder<S, EVENT>(private val state: S) {
+  fun build() = Pair(state, this)
+
+  private val transitionsMap = mutableMapOf<EVENT, Unit>()
+
+  val events: List<EVENT>
+    get() = transitionsMap.keys.toList()
+
+  fun <E : EVENT> on(event: E, transition: S.() -> Unit) {
+    transitionsMap[event] = Unit
+  }
 }
