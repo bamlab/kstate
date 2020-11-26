@@ -16,16 +16,23 @@ sealed class TrafficLightEvent {
 }
 
 class MachineTest {
+  // Given
+  private val testMachine =
+      machine<TrafficLightState, TrafficLightEvent> {
+        initial(TrafficLightState.RED)
+        state(TrafficLightState.GREEN) {
+          on(TrafficLightEvent.TIMER) {}
+          on(TrafficLightEvent.POWER_OUTAGE) {}
+        }
+        state(TrafficLightState.YELLOW) {
+          on(TrafficLightEvent.TIMER) {}
+          on(TrafficLightEvent.POWER_OUTAGE) {}
+        }
+        state(TrafficLightState.RED) { on(TrafficLightEvent.TIMER) {} }
+      }
+
   @Test
   fun `it should register states`() {
-    // Given
-    val testMachine =
-        machine<TrafficLightState, TrafficLightEvent> {
-          state(TrafficLightState.GREEN) {}
-          state(TrafficLightState.YELLOW) {}
-          state(TrafficLightState.RED) {}
-        }
-
     // When
     val states = testMachine.states
 
@@ -36,24 +43,19 @@ class MachineTest {
 
   @Test
   fun `it should register events`() {
-    // Given
-    val testMachine =
-        machine<TrafficLightState, TrafficLightEvent> {
-          state(TrafficLightState.GREEN) {
-            on(TrafficLightEvent.TIMER) {}
-            on(TrafficLightEvent.POWER_OUTAGE) {}
-          }
-          state(TrafficLightState.YELLOW) {
-            on(TrafficLightEvent.TIMER) {}
-            on(TrafficLightEvent.POWER_OUTAGE) {}
-          }
-          state(TrafficLightState.RED) { on(TrafficLightEvent.TIMER) {} }
-        }
-
     // When
     val events = testMachine.events
 
     // Then
     assertEquals(listOf(TrafficLightEvent.TIMER, TrafficLightEvent.POWER_OUTAGE), events)
+  }
+
+  @Test
+  fun `it should register the initial state`() {
+    // When
+    val initialState = testMachine.initialState
+
+    // Then
+    assertEquals(TrafficLightState.RED, initialState)
   }
 }
