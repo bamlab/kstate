@@ -10,6 +10,22 @@ interface Machine<STATE, EVENT> {
   val initialState: STATE
   /** List of accepted events. */
   val events: List<EVENT>
+
+  /**
+   * Determines the next state given the current `state` and sent `event`.
+   * @param state The current State instance or state value
+   * @param event The event that was sent at the current state
+   */
+  fun transition(state: State<STATE, EVENT>, event: EVENT): State<STATE, EVENT>
+  fun transition(state: STATE, event: EVENT): State<STATE, EVENT>
+}
+
+interface State<STATE, EVENT> {
+  fun transition(event: EVENT): STATE
+
+  val stateValue: STATE
+  var history: State<STATE, EVENT>?
+  val events: List<EVENT>
 }
 
 /**
@@ -20,7 +36,7 @@ class MachineBuilder<STATE : Any, EVENT : Any> private constructor() : Machine<S
 
   override lateinit var initialState: STATE
 
-  private val statesMap = mutableMapOf<STATE, StateBuilder<out STATE, EVENT>>()
+  private val statesMap = mutableMapOf<STATE, State<STATE, EVENT>>()
 
   override val states: List<STATE>
     get() = statesMap.keys.toList()
@@ -28,9 +44,8 @@ class MachineBuilder<STATE : Any, EVENT : Any> private constructor() : Machine<S
   override val events: List<EVENT>
     get() = statesMap.values.flatMap { it.events }.distinct()
 
-  fun <S : STATE> state(state: S, init: StateBuilder<S, EVENT>.() -> Unit) {
-    val (k, v) = StateBuilder<S, EVENT>(state).apply(init).build()
-    statesMap[k] = v
+  fun <S : STATE> state(state: S, init: StateBuilder<EVENT, STATE>.() -> Unit) {
+    statesMap[state] = StateBuilder<EVENT, STATE>(state).apply(init).build()
   }
 
   fun <S : STATE> initial(state: S) {
@@ -46,17 +61,42 @@ class MachineBuilder<STATE : Any, EVENT : Any> private constructor() : Machine<S
     fun <STATE : Any, EVENT : Any> machine(init: MachineBuilder<STATE, EVENT>.() -> Unit) =
         MachineBuilder<STATE, EVENT>().apply(init).build()
   }
+
+  override fun transition(state: State<STATE, EVENT>, event: EVENT): State<STATE, EVENT> {
+    return statesMap[state.transition(event)]!!.also {
+      state.history = null
+      it.history = state
+    }
+  }
+
+  override fun transition(stateValue: STATE, event: EVENT): State<STATE, EVENT> {
+    statesMap[stateValue].let {
+      if (it == null) {
+        throw Error("Cannot transition from not found state `$stateValue`")
+      } else return transition(it, event)
+    }
+  }
 }
 
-class StateBuilder<S, EVENT>(private val state: S) {
-  fun build() = Pair(state, this)
+class StateBuilder<EVENT, STATE>(
+    override val stateValue: STATE, override var history: State<STATE, EVENT>? = null
+) : State<STATE, EVENT> {
+  fun build() = this as State<STATE, EVENT>
 
-  private val transitionsMap = mutableMapOf<EVENT, Unit>()
+  private lateinit var transitionsMap: Map<EVENT, STATE>
 
-  val events: List<EVENT>
+  override val events: List<EVENT>
     get() = transitionsMap.keys.toList()
 
-  fun <E : EVENT> on(event: E, transition: S.() -> Unit) {
-    transitionsMap[event] = Unit
+  fun on(vararg transitions: Pair<EVENT, STATE>) {
+    transitionsMap = mapOf(*transitions)
+  }
+
+  override fun transition(event: EVENT): STATE {
+    transitionsMap[event].let {
+      if (it == null) {
+        throw Error("Cannot find transition for event `$event` for state `$stateValue`")
+      } else return it
+    }
   }
 }
