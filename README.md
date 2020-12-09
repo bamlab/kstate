@@ -42,6 +42,4 @@ val myMachine = machine<TrafficLightState> {
 
 ### Developed with IntelliJ IDEA
 
-Thank to [JetBrains](https://www.jetbrains.com/?from=kstate) Support Program.
-
 [![JetBrains](./jetbrains.svg)](https://www.jetbrains.com/?from=kstate)
