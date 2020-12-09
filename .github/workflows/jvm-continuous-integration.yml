@@ -32,8 +32,10 @@ jobs:
 
       - name: Build docs
         run: ./gradlew dokkaHtml
+        if: github.ref == 'refs/heads/master'
       - name: Publish docs
         uses: JamesIves/github-pages-deploy-action@3.7.1
+        if: github.ref == 'refs/heads/master'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
