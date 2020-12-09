@@ -19,8 +19,18 @@ sealed class TrafficLightEvent {
   object POWER_OUTAGE : TrafficLightEvent()
 }
 
+// Builder - Litho
+val machine =
+    MachineBuilder.create()
+        .addState(StateBuilder.create().addEvent(EventBuilder.create().addTransition("lala")))
+        .addState(StateBuilder.create().addEvent(EventBuilder.create().addTransition("lala")))
+        .addState(StateBuilder.create().addEvent(EventBuilder.create().addTransition("lala")))
+        .addState(StateBuilder.create().addEvent(EventBuilder.create().addTransition("lala")))
+        .build()
+
 class MachineTest {
   // Given
+  // => DSL - Jetpack Compose - Koin module { scope<> }
   private val testMachine =
       machine<TrafficLightState, TrafficLightEvent> {
         initial(RED)
