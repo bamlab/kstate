@@ -1,13 +1,13 @@
 ![kstate](./kstate.svg)
 
-![JVM Continuous Integration](https://github.com/tpucci/kstate/workflows/JVM%20Continuous%20Integration/badge.svg)
+![JVM Continuous Integration](https://github.com/bamlab/kstate/workflows/JVM%20Continuous%20Integration/badge.svg)
 
-![JVM Continuous Deployment](https://github.com/tpucci/kstate/workflows/JVM%20Continuous%20Deployment/badge.svg)
+![JVM Continuous Deployment](https://github.com/bamlab/kstate/workflows/JVM%20Continuous%20Deployment/badge.svg)
 
 ## Install
 
 ```groovy
-implementation("com.github.tpucci:kstate-jvm:VERSION")
+implementation("com.github.bamlab:kstate-jvm:VERSION")
 ```
 
 ### Snapshot releases
@@ -18,7 +18,7 @@ repositories {
 }
 // ...
 
-implementation("com.github.tpucci:kstate-jvm:VERSION-SNAPSHOT")
+implementation("com.github.bamlab:kstate-jvm:VERSION-SNAPSHOT")
 ```
 
 ## Usage
@@ -27,18 +27,17 @@ implementation("com.github.tpucci:kstate-jvm:VERSION-SNAPSHOT")
 
 ```kotlin
 sealed class TrafficLightState {
-  object GREEN : TrafficLightState()
-  object YELLOW : TrafficLightState()
-  object RED : TrafficLightState()
+    object GREEN : TrafficLightState()
+    object YELLOW : TrafficLightState()
+    object RED : TrafficLightState()
 }
 
 val myMachine = machine<TrafficLightState> {
-  state(TrafficLightState.GREEN) {}
-  state(TrafficLightState.YELLOW) {}
-  state(TrafficLightState.RED) {}
+    state(TrafficLightState.GREEN) {}
+    state(TrafficLightState.YELLOW) {}
+    state(TrafficLightState.RED) {}
 }
 ```
-
 
 ### Developed with IntelliJ IDEA
 

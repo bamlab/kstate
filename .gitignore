@@ -15,3 +15,6 @@ build
 .settings
 .project
 .classpath
+
+# Draft files
+draft

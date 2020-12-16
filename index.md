@@ -6,10 +6,10 @@ The module shows the Dokka syntax usage.
 
 Test
 
-# Package com.github.tpucci
+# Package com.github.bamlab
 
 Contains assorted useful stuff.
 
 ## Level 2 heading
 
-Text after this heading is also part of documentation for `com.tpucci.kstate`
+Text after this heading is also part of documentation for `com.bamlab.kstate`
