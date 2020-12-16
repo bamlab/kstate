@@ -9,7 +9,7 @@ plugins {
     signing
 }
 
-group = "com.github.tpucci"
+group = "com.github.bamlab"
 version = "0.0.0-SNAPSHOT"
 
 repositories {
@@ -69,7 +69,7 @@ afterEvaluate {
             pom {
                 name.set("kstate")
                 description.set("A Kotlin Multiplatform library for creating state machines")
-                url.set("https://github.com/tpucci/kstate")
+                url.set("https://github.com/bamlab/kstate")
 
                 licenses {
                     license {
@@ -80,13 +80,13 @@ afterEvaluate {
                 }
                 developers {
                     developer {
-                        id.set("tpucci")
+                        id.set("bamlab")
                         name.set("Thomas Pucci")
                     }
                 }
                 scm {
-                    url.set("https://github.com/tpucci/kstate")
-                    connection.set("scm:git:https://github.com/tpucci/kstate")
+                    url.set("https://github.com/bamlab/kstate")
+                    connection.set("scm:git:https://github.com/bamlab/kstate")
                 }
             }
         }
@@ -124,11 +124,11 @@ tasks.withType<DokkaTask>().configureEach {
             includes.from("index.md")
             sourceLink {
                 localDirectory.set(file("src/commonMain/kotlin"))
-                remoteUrl.set(URL("https://github.com/tpucci/kstate/blob/master/src/commonMain/kotlin"))
+                remoteUrl.set(URL("https://github.com/bamlab/kstate/blob/master/src/commonMain/kotlin"))
                 remoteLineSuffix.set("#L")
             }
             externalDocumentationLink {
-                url.set(URL("https://tpucci.github.io/kstate/kstate/"))
+                url.set(URL("https://bamlab.github.io/kstate/kstate/"))
             }
         }
     }
