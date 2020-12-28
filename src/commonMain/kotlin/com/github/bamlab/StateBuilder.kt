@@ -1,12 +1,16 @@
 package com.github.bamlab
 
-class StateBuilder(private val machineState: MachineState) {
-  fun on(event: () -> MachineEvent) {}
+class State(val machineState: MachineState, val transitions: List<Transition>)
 
-  // TODO: Change returned type to State
-  fun build(): MachineState {
-    return machineState
+class StateBuilder(private val machineState: MachineState) {
+
+  val transitions: MutableList<Transition> = mutableListOf()
+
+  fun on(event: () -> MachineEvent): TransitionBuilder {
+    return TransitionBuilder(this, event())
+  }
+
+  fun build(): State {
+    return State(machineState, transitions)
   }
 }
-
-infix fun Unit.transitionTo(state: MachineState) {}

@@ -1,10 +1,16 @@
 package com.github.bamlab
 
-class Machine(val states: List<MachineState>)
+class Machine(private val states: List<State>) {
+  val registeredEvents: List<MachineEvent>
+    get() =
+        states.flatMap { it.transitions.map { transition -> transition.machineEvent } }.distinct()
+
+  val registeredStates: List<MachineState>
+    get() = states.map { it.machineState }
+}
 
 class MachineBuilder {
-
-  val states: MutableList<MachineState> = mutableListOf()
+  private val states: MutableList<State> = mutableListOf()
 
   fun build(): Machine {
     return Machine(states)

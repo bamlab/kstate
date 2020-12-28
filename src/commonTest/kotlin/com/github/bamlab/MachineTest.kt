@@ -1,6 +1,7 @@
 package com.github.bamlab
 
-import com.github.bamlab.LightMachineEvents.*
+import com.github.bamlab.LightMachineEvents.POWER_OUTAGE
+import com.github.bamlab.LightMachineEvents.TIMER
 import com.github.bamlab.LightMachineStates.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -17,6 +18,7 @@ sealed class LightMachineEvents : MachineEvent {
 }
 
 class MachineTest {
+  // Given
   private val testMachine =
       machine {
         initial(RED)
@@ -34,9 +36,18 @@ class MachineTest {
   @Test
   fun `it should register states`() {
     // When
-    val states = testMachine.states
+    val registeredStates = testMachine.registeredStates
 
     // Then
-    assertEquals(listOf(GREEN, YELLOW, RED), states)
+    assertEquals(listOf(GREEN, YELLOW, RED), registeredStates)
+  }
+
+  @Test
+  fun `it should register events`() {
+    // When
+    val registeredEvents = testMachine.registeredEvents
+
+    // Then
+    assertEquals(listOf(TIMER, POWER_OUTAGE), registeredEvents)
   }
 }
