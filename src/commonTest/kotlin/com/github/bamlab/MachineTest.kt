@@ -6,6 +6,7 @@ import com.github.bamlab.LightMachineStates.*
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 sealed class LightMachineStates : MachineState {
   object RED : LightMachineStates()
@@ -22,6 +23,7 @@ class MachineTest {
   // Given
   lateinit var testMachine: Machine
 
+  // Given
   @BeforeTest
   fun beforeTest() {
     testMachine =
@@ -73,5 +75,24 @@ class MachineTest {
 
     // Then
     assertEquals(GREEN, testMachine.value)
+  }
+
+  @Test
+  fun `it should register history`() {
+    // When
+    testMachine.transition(TIMER)
+
+    // Then
+    assertEquals(RED, testMachine.state.history!!.value)
+  }
+
+  @Test
+  fun `it should not register more than one history`() {
+    // When
+    testMachine.transition(TIMER)
+    testMachine.transition(TIMER)
+
+    // Then
+    assertNull(testMachine.state.history!!.history)
   }
 }

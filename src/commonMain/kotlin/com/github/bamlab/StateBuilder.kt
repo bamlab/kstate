@@ -1,6 +1,12 @@
 package com.github.bamlab
 
-class State(val value: MachineState, val transitions: Map<MachineEvent, Transition>)
+class State(val value: MachineState, val transitions: Map<MachineEvent, Transition>) {
+  var history: State? = null
+    set(value) {
+      value?.apply { this.history = null }
+      field = value
+    }
+}
 
 class StateBuilder(private val machineState: MachineState) {
 

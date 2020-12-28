@@ -1,7 +1,7 @@
 package com.github.bamlab
 
 class Machine(val initialState: State, private val statesMap: Map<MachineState, State>) {
-  var currentState: State = initialState
+  var state: State = initialState
 
   val registeredEvents: List<MachineEvent>
     get() = statesMap.values.flatMap { it.transitions.keys }.distinct()
@@ -10,13 +10,13 @@ class Machine(val initialState: State, private val statesMap: Map<MachineState, 
     get() = statesMap.values.map { it.value }
 
   val value: MachineState
-    get() = currentState.value
+    get() = state.value
 
   fun transition(event: MachineEvent) {
-    val transition = currentState.transitions[event] ?: return
+    val transition = state.transitions[event] ?: return
     val nextState = statesMap[transition.state] ?: return
-
-    currentState = nextState
+    nextState.history = state
+    state = nextState
   }
 }
 
