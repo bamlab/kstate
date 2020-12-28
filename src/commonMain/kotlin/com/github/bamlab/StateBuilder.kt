@@ -1,16 +1,16 @@
 package com.github.bamlab
 
-class State(val value: MachineState, val transitions: List<Transition>)
+class State(val value: MachineState, val transitions: Map<MachineEvent, Transition>)
 
 class StateBuilder(private val machineState: MachineState) {
 
-  val transitions: MutableList<Transition> = mutableListOf()
+  val transitionsMap: MutableMap<MachineEvent, Transition> = mutableMapOf()
 
   fun on(event: () -> MachineEvent): TransitionBuilder {
     return TransitionBuilder(this, event())
   }
 
   fun build(): State {
-    return State(machineState, transitions)
+    return State(machineState, transitionsMap)
   }
 }

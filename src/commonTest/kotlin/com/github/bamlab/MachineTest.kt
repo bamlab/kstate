@@ -3,6 +3,7 @@ package com.github.bamlab
 import com.github.bamlab.LightMachineEvents.POWER_OUTAGE
 import com.github.bamlab.LightMachineEvents.TIMER
 import com.github.bamlab.LightMachineStates.*
+import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,19 +20,24 @@ sealed class LightMachineEvents : MachineEvent {
 
 class MachineTest {
   // Given
-  private val testMachine =
-      machine {
-        initial(RED)
-        state(GREEN) {
-          on { TIMER } transitionTo YELLOW
-          on { POWER_OUTAGE } transitionTo YELLOW
+  lateinit var testMachine: Machine
+
+  @BeforeTest
+  fun beforeTest() {
+    testMachine =
+        machine {
+          initial(RED)
+          state(GREEN) {
+            on { TIMER } transitionTo YELLOW
+            on { POWER_OUTAGE } transitionTo YELLOW
+          }
+          state(YELLOW) { on { TIMER } transitionTo RED }
+          state(RED) {
+            on { TIMER } transitionTo GREEN
+            on { POWER_OUTAGE } transitionTo YELLOW
+          }
         }
-        state(YELLOW) { on { TIMER } transitionTo RED }
-        state(RED) {
-          on { TIMER } transitionTo GREEN
-          on { POWER_OUTAGE } transitionTo YELLOW
-        }
-      }
+  }
 
   @Test
   fun `it should register states`() {
@@ -58,5 +64,14 @@ class MachineTest {
 
     // Then
     assertEquals(RED, initialState.value)
+  }
+
+  @Test
+  fun `it should transition to other states`() {
+    // When
+    testMachine.transition(TIMER)
+
+    // Then
+    assertEquals(GREEN, testMachine.value)
   }
 }

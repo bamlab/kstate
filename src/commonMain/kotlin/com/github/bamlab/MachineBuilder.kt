@@ -1,12 +1,23 @@
 package com.github.bamlab
 
-class Machine(val initialState: State, private val states: List<State>) {
+class Machine(val initialState: State, private val statesMap: Map<MachineState, State>) {
+  var currentState: State = initialState
+
   val registeredEvents: List<MachineEvent>
-    get() =
-        states.flatMap { it.transitions.map { transition -> transition.machineEvent } }.distinct()
+    get() = statesMap.values.flatMap { it.transitions.keys }.distinct()
 
   val registeredStates: List<MachineState>
-    get() = states.map { it.value }
+    get() = statesMap.values.map { it.value }
+
+  val value: MachineState
+    get() = currentState.value
+
+  fun transition(event: MachineEvent) {
+    val transition = currentState.transitions[event] ?: return
+    val nextState = statesMap[transition.state] ?: return
+
+    currentState = nextState
+  }
 }
 
 class MachineBuilder {
@@ -14,8 +25,7 @@ class MachineBuilder {
   private val statesMap: MutableMap<MachineState, State> = mutableMapOf()
 
   fun build(): Machine {
-    return Machine(
-        statesMap[initialState] ?: StateBuilder(initialState).build(), statesMap.values.toList())
+    return Machine(statesMap[initialState] ?: StateBuilder(initialState).build(), statesMap)
   }
 
   fun initial(state: MachineState) {
