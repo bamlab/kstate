@@ -1,3 +1,5 @@
 package com.github.bamlab
 
-interface MachineState
+abstract class MachineState {
+    val allowedTransitions: MutableMap<MachineEvent, MachineState> = mutableMapOf()
+}

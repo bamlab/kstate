@@ -1,7 +1,9 @@
 package com.github.bamlab
 
 class StateBuilder(private val machineState: MachineState) {
-  fun on(event: () -> MachineEvent) {}
+
+  infix fun on(event: () -> MachineEvent) = Pair(machineState, event())
+
 
   // TODO: Change returned type to State
   fun build(): MachineState {
@@ -9,4 +11,6 @@ class StateBuilder(private val machineState: MachineState) {
   }
 }
 
-infix fun Unit.transitionTo(state: MachineState) {}
+infix fun Pair<MachineState, MachineEvent>.transitionTo(state: MachineState) {
+  first.allowedTransitions[second] = state
+}

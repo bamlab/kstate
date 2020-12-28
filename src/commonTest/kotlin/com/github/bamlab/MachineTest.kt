@@ -5,7 +5,7 @@ import com.github.bamlab.LightMachineStates.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-sealed class LightMachineStates : MachineState {
+sealed class LightMachineStates : MachineState() {
   object RED : LightMachineStates()
   object GREEN : LightMachineStates()
   object YELLOW : LightMachineStates()
@@ -47,5 +47,16 @@ class MachineTest {
 
     // Then
     assertEquals(RED, initialState)
+  }
+
+  @Test
+  fun `it should transition to correct state`() {
+    // When
+    val event = TIMER
+    testMachine.transition(event = event)
+
+
+    // Then
+    assertEquals(GREEN, testMachine.currentState)
   }
 }
