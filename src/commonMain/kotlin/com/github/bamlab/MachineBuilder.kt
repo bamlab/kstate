@@ -4,8 +4,12 @@ class Machine(val states: List<MachineState>, val initialState: MachineState) {
     var currentState = initialState
 
     fun transition(event: MachineEvent) {
-      if(event in currentState.allowedTransitions.keys )
-        currentState = currentState.allowedTransitions[event] ?: error("The transition could not be found")
+        if (event in currentState.allowedTransitions.keys)
+            currentState =
+                currentState.allowedTransitions[event] ?: error("The transition could not be found")
+        else
+            throw MachineError.UnvalidTransition
+
     }
 }
 

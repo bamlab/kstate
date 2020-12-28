@@ -4,6 +4,7 @@ import com.github.bamlab.LightMachineEvents.*
 import com.github.bamlab.LightMachineStates.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 sealed class LightMachineStates : MachineState() {
     object RED : LightMachineStates()
@@ -57,5 +58,19 @@ class MachineTest {
 
         // Then
         assertEquals(GREEN, testMachine.currentState)
+    }
+
+    @Test
+    fun `it should not transition when event is not declared`() {
+        // When
+        val toYellow = TIMER
+        testMachine.transition(event = toYellow)
+
+        val unRegisteredEvent = TIMER
+        
+        // Then
+        assertFailsWith<MachineError.UnvalidTransition>{
+            testMachine.transition(event = unRegisteredEvent)
+        }
     }
 }
