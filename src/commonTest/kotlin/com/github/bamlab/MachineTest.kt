@@ -8,20 +8,20 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-sealed class LightMachineStates : MachineState {
-  object RED : LightMachineStates()
-  object GREEN : LightMachineStates()
-  object YELLOW : LightMachineStates()
+enum class LightMachineStates : MachineState {
+  RED,
+  GREEN,
+  YELLOW
 }
 
-sealed class LightMachineEvents : MachineEvent {
-  object TIMER : LightMachineEvents()
-  object POWER_OUTAGE : LightMachineEvents()
+enum class LightMachineEvents : MachineEvent {
+  TIMER,
+  POWER_OUTAGE
 }
 
 class MachineTest {
   // Given
-  lateinit var testMachine: Machine
+  private lateinit var testMachine: Machine
 
   // Given
   @BeforeTest
