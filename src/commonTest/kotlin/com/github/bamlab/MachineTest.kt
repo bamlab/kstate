@@ -50,4 +50,13 @@ class MachineTest {
     // Then
     assertEquals(listOf(TIMER, POWER_OUTAGE), registeredEvents)
   }
+
+  @Test
+  fun `it should register initial state`() {
+    // When
+    val initialState = testMachine.initialState
+
+    // Then
+    assertEquals(RED, initialState.value)
+  }
 }

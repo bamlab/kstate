@@ -1,6 +1,6 @@
 package com.github.bamlab
 
-class State(val machineState: MachineState, val transitions: List<Transition>)
+class State(val value: MachineState, val transitions: List<Transition>)
 
 class StateBuilder(private val machineState: MachineState) {
 
