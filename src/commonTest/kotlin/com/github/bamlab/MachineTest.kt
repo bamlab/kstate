@@ -39,4 +39,13 @@ class MachineTest {
     // Then
     assertEquals(listOf(GREEN, YELLOW, RED), states)
   }
+
+  @Test
+  fun `it should have correct initial state`() {
+    // When
+    val initialState = testMachine.initialState
+
+    // Then
+    assertEquals(RED, initialState)
+  }
 }

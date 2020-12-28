@@ -1,17 +1,17 @@
 package com.github.bamlab
 
-class Machine(val states: List<MachineState>)
+class Machine(val states: List<MachineState>, val initialState: MachineState)
 
 class MachineBuilder {
 
   val states: MutableList<MachineState> = mutableListOf()
-
+  lateinit var initialState: MachineState
   fun build(): Machine {
-    return Machine(states)
+    return Machine(states, initialState)
   }
 
   fun initial(state: MachineState) {
-    // TODO
+    initialState = state
   }
 
   fun state(state: MachineState, setup: StateBuilder.() -> Unit) {
