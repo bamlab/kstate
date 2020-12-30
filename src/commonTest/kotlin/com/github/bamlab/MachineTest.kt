@@ -170,6 +170,8 @@ class MachineTest {
     // Then
     assertEquals(rootState, root.state.value)
     assertEquals(fooState, root.state.compoundMachine!!.state.value)
+    assertNull(root.state.compoundMachine!!.state.history)
     assertEquals(barState, root.state.compoundMachine!!.state.compoundMachine!!.state.value)
+    assertNull(root.state.compoundMachine!!.state.compoundMachine!!.state.history)
   }
 }
