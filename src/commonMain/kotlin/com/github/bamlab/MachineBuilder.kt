@@ -13,6 +13,10 @@ class Machine(val initialState: State, private val statesMap: Map<MachineState, 
     get() = state.value
 
   fun transition(event: MachineEvent) {
+    if (state.compoundMachine != null) {
+      state.compoundMachine!!.transition(event)
+    }
+
     val transition = state.transitions[event] ?: return
     val nextState = statesMap[transition.state] ?: return
     nextState.history = state
