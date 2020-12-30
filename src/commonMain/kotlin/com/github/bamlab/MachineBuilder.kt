@@ -1,7 +1,13 @@
 package com.github.bamlab
 
+import com.github.bamlab.State.Companion.from
+
 class Machine(val initialState: State, private val statesMap: Map<MachineState, State>) {
   var state: State = initialState
+    set(value) {
+      value.history = field
+      field = value
+    }
 
   val registeredEvents: List<MachineEvent>
     get() = statesMap.values.flatMap { it.transitions.keys }.distinct()
@@ -19,21 +25,21 @@ class Machine(val initialState: State, private val statesMap: Map<MachineState, 
 
     val transition = state.transitions[event] ?: return
     val nextState =
-        if (transition.state !is CompoundMachineState) {
-          statesMap[transition.state] ?: return
-        } else {
-          statesMap[transition.state.parent] ?: return
-        }
-    nextState.history = state
+        statesMap[transition.targetState]?.let { from(it, transition.compoundState) } ?: return
     state = nextState
+  }
 
-    if (transition.state.compound != null) {
-      state.compoundMachine?.let { compoundMachine ->
-        compoundMachine.statesMap[transition.state.compound!!]?.let { state ->
-          compoundMachine.state = state
-        }
-      }
-    }
+  fun reset(initialTransition: Transition) {
+    val nextState =
+        statesMap[initialTransition.targetState]?.let { from(it, initialTransition.compoundState) }
+            ?: return
+    state = nextState
+    state.history = null
+  }
+
+  fun reset() {
+    state = initialState
+    state.history = null
   }
 }
 

@@ -137,4 +137,39 @@ class MachineTest {
     assertEquals(RED, lightMachine.state.value)
     assertEquals(BLINKING, lightMachine.state.compoundMachine!!.state.value)
   }
+
+  @Test
+  fun `it should transition in all compound machines`() {
+    // Given
+    val stubState = object : MachineState {}
+    val rootState = object : MachineState {}
+    val fooState = object : MachineState {}
+    val barState = object : MachineState {}
+    val bazEvent = object : MachineEvent {}
+    val root =
+        machine {
+          initial(stubState)
+          state(stubState) { on { bazEvent } transitionTo rootState + fooState + barState }
+
+          state(rootState) {
+            +machine {
+              initial(stubState)
+              state(fooState) {
+                +machine {
+                  initial(stubState)
+                  state(barState) {}
+                }
+              }
+            }
+          }
+        }
+
+    // When
+    root.transition(bazEvent)
+
+    // Then
+    assertEquals(rootState, root.state.value)
+    assertEquals(fooState, root.state.compoundMachine!!.state.value)
+    assertEquals(barState, root.state.compoundMachine!!.state.compoundMachine!!.state.value)
+  }
 }

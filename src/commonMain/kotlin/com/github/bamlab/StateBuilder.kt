@@ -10,6 +10,15 @@ class State(
       value?.apply { this.history = null }
       field = value
     }
+
+  companion object {
+    fun from(state: State, compoundMachineState: MachineState?): State {
+      state.compoundMachine?.let {
+        if (compoundMachineState != null) it.reset(Transition(compoundMachineState)) else it.reset()
+      }
+      return state
+    }
+  }
 }
 
 class StateBuilder(private val machineState: MachineState) {
