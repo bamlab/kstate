@@ -25,13 +25,16 @@ class Machine(val initialState: State, private val statesMap: Map<MachineState, 
 
     val transition = state.transitions[event] ?: return
     val nextState =
-        statesMap[transition.targetState]?.let { from(it, transition.compoundState) } ?: return
+        statesMap[transition.targetState]?.let { from(it, transition.compoundState, state.history) }
+            ?: return
     state = nextState
   }
 
   fun reset(initialTransition: Transition) {
     val nextState =
-        statesMap[initialTransition.targetState]?.let { from(it, initialTransition.compoundState) }
+        statesMap[initialTransition.targetState]?.let {
+          from(it, initialTransition.compoundState, state.history)
+        }
             ?: return
     state = nextState
     state.history = null

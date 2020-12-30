@@ -174,4 +174,28 @@ class MachineTest {
     assertEquals(barState, root.state.compoundMachine!!.state.compoundMachine!!.state.value)
     assertNull(root.state.compoundMachine!!.state.compoundMachine!!.state.history)
   }
+
+  @Test
+  fun `it should transition back to history state`() {
+    // Given
+    val fooState = object : MachineState {}
+    val barState = object : MachineState {}
+    val historyState = object : MachineState {}
+    val fooEvent = object : MachineEvent {}
+    val backEvent = object : MachineEvent {}
+    val root =
+        machine {
+          initial(fooState)
+          state(fooState) { on { fooEvent } transitionTo barState }
+          state(barState) { on { backEvent } transitionTo historyState }
+          state(historyState) { type(StateType.HISTORY) }
+        }
+
+    // When
+    root.transition(fooEvent)
+    root.transition(backEvent)
+
+    // Then
+    assertEquals(fooState, root.state.value)
+  }
 }
