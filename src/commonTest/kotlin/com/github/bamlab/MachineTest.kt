@@ -53,12 +53,12 @@ class MachineTest {
           initial(RED)
           state(GREEN) {
             on { TIMER } transitionTo YELLOW
-            on { POWER_OUTAGE } transitionTo YELLOW
+            on { POWER_OUTAGE } transitionTo RED
           }
           state(YELLOW) { on { TIMER } transitionTo RED }
           state(RED) {
             on { TIMER } transitionTo GREEN
-            on { POWER_OUTAGE } transitionTo YELLOW
+            on { POWER_OUTAGE } transitionTo RED + BLINKING
             +pedestrianMachine
           }
         }
@@ -126,5 +126,15 @@ class MachineTest {
 
     // Then
     assertEquals(WAIT, lightMachine.state.compoundMachine!!.state.value)
+  }
+
+  @Test
+  fun `it should transition both in root and in compound machine`() {
+    // When
+    lightMachine.transition(POWER_OUTAGE)
+
+    // Then
+    assertEquals(RED, lightMachine.state.value)
+    assertEquals(BLINKING, lightMachine.state.compoundMachine!!.state.value)
   }
 }

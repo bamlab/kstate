@@ -18,9 +18,22 @@ class Machine(val initialState: State, private val statesMap: Map<MachineState, 
     }
 
     val transition = state.transitions[event] ?: return
-    val nextState = statesMap[transition.state] ?: return
+    val nextState =
+        if (transition.state !is CompoundMachineState) {
+          statesMap[transition.state] ?: return
+        } else {
+          statesMap[transition.state.parent] ?: return
+        }
     nextState.history = state
     state = nextState
+
+    if (transition.state.compound != null) {
+      state.compoundMachine?.let { compoundMachine ->
+        compoundMachine.statesMap[transition.state.compound!!]?.let { state ->
+          compoundMachine.state = state
+        }
+      }
+    }
   }
 }
 
