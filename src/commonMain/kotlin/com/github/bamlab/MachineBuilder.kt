@@ -55,7 +55,7 @@ class MachineBuilder {
     initialState = state
   }
 
-  fun state(state: MachineState, setup: StateBuilder.() -> Unit) {
+  fun state(state: MachineState, setup: StateBuilder.() -> Unit = {}) {
     val stateBuilder = StateBuilder(state)
     stateBuilder.setup()
     statesMap[state] = stateBuilder.build()

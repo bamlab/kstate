@@ -157,7 +157,7 @@ class MachineTest {
               state(fooState) {
                 +machine {
                   initial(stubState)
-                  state(barState) {}
+                  state(barState)
                 }
               }
             }
