@@ -1,10 +1,10 @@
-package com.github.bamlab
+package tech.bam
 
-import com.github.bamlab.LightMachineEvents.POWER_OUTAGE
-import com.github.bamlab.LightMachineEvents.TIMER
-import com.github.bamlab.LightMachineStates.*
-import com.github.bamlab.PedestrianMachineEvents.PED_COUNTDOWN
-import com.github.bamlab.PedestrianMachineStates.*
+import tech.bam.LightMachineEvents.POWER_OUTAGE
+import tech.bam.LightMachineEvents.TIMER
+import tech.bam.LightMachineStates.*
+import tech.bam.PedestrianMachineEvents.PED_COUNTDOWN
+import tech.bam.PedestrianMachineStates.*
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

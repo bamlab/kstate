@@ -1,4 +1,4 @@
-package com.github.bamlab
+package tech.bam
 
 interface MachineState {
   operator fun plus(compoundMachineState: MachineState): CompoundMachineState {

@@ -1,4 +1,4 @@
-package com.github.bamlab
+package tech.bam
 
 class Transition(private val state: MachineState) {
   val compoundState: MachineState?

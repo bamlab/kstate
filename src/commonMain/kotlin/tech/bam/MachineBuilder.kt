@@ -1,6 +1,6 @@
-package com.github.bamlab
+package tech.bam
 
-import com.github.bamlab.State.Companion.from
+import tech.bam.State.Companion.from
 
 class Machine(val initialState: State, private val statesMap: Map<MachineState, State>) {
   var state: State = initialState

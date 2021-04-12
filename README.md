@@ -7,7 +7,7 @@
 ## Install
 
 ```groovy
-implementation("com.github.bamlab:kstate-jvm:VERSION")
+implementation("tech.bam:kstate-jvm:VERSION")
 ```
 
 ### Snapshot releases
@@ -18,7 +18,7 @@ repositories {
 }
 // ...
 
-implementation("com.github.bamlab:kstate-jvm:VERSION-SNAPSHOT")
+implementation("tech.bam:kstate-jvm:VERSION-SNAPSHOT")
 ```
 
 ## Usage

@@ -9,7 +9,7 @@ plugins {
     signing
 }
 
-group = "com.github.bamlab"
+group = "tech.bam"
 version = "0.0.0-SNAPSHOT"
 
 repositories {

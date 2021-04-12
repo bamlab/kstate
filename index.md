@@ -6,7 +6,7 @@ The module shows the Dokka syntax usage.
 
 Test
 
-# Package com.github.bamlab
+# Package tech.bam
 
 Contains assorted useful stuff.
 

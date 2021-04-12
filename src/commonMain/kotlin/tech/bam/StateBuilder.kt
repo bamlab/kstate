@@ -1,4 +1,4 @@
-package com.github.bamlab
+package tech.bam
 
 class State(
     val type: StateType,

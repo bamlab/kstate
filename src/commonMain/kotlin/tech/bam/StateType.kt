@@ -1,4 +1,4 @@
-package com.github.bamlab
+package tech.bam
 
 enum class StateType {
   DEFAULT,
