@@ -34,8 +34,6 @@ internal class KSTransitionBuilder : KSTransition() {
         this.effect = effect
         return this
     }
-
-    fun build() {}
 }
 
 internal fun createTransition(
@@ -49,6 +47,5 @@ internal fun createTransition(
         .setTarget(target)
         .setEffect(effect)
 
-    ksTransition.build()
     return ksTransition
 }
