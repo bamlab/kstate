@@ -32,6 +32,22 @@ open class KSState(val id: KSStateId) {
         ).flatten()
         return listOf()
     }
+
+    fun send(event: KSEvent) {
+        if (isCompound()) {
+            val transition = currentState()!!.findTransitionOn(event)
+            if (transition != null) {
+                if (transition.target != null) {
+                    val newState = states.find { it.id == transition.target }
+                    if (newState != null) {
+                        currentStateId = newState.id
+                    }
+                }
+            } else {
+                currentState()!!.send(event)
+            }
+        }
+    }
 }
 
 class KSStateBuilder(id: KSStateId) : KSState(id) {

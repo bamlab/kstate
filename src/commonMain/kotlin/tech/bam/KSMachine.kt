@@ -35,6 +35,8 @@ open class KSMachine {
                     currentStateId = newState.id
                 }
             }
+        } else {
+            currentState().send(event)
         }
     }
 

@@ -45,6 +45,7 @@ class KSStateMachineFunctionalTest {
         assertEquals(listOf(RED, WALK), machine.activeStateIds())
     }
 
+    @Test
     fun `it transitions between nested states`() {
         val machine = createMachine {
             initial(RED)
