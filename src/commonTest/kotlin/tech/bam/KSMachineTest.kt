@@ -39,7 +39,7 @@ class KSMachineTest {
     @Test
     fun `it should register an initial state`() {
         val machine = createMachine {
-            initial = RED
+            initial(RED)
             state(RED)
             state(YELLOW)
             state(GREEN)
