@@ -4,7 +4,12 @@ import tech.bam.domain.exception.AlreadyRegisteredStateId
 import tech.bam.domain.exception.NoRegisteredStates
 import tech.bam.domain.exception.UnexpectedError
 
-open class KSMachine {
+sealed class KSStrategyType {
+    object External : KSStrategyType()
+    object Internal : KSStrategyType()
+}
+
+open class KSMachine(private val strategy: KSStrategyType) {
     // Protected API
     protected var states: List<KSState> = listOf()
     lateinit var initial: KSStateId
@@ -26,18 +31,37 @@ open class KSMachine {
     val stateIds: List<KSStateId>
         get() = states.map { it.id }
 
-    fun send(event: KSEvent) {
-        val transition = currentState().findTransitionOn(event)
-        if (transition != null) {
-            if (transition.target != null) {
-                val newState = states.find { it.id == transition.target }
-                if (newState != null) {
-                    currentStateId = newState.id
+    fun send(event: KSEvent): Boolean {
+        if (strategy == KSStrategyType.External) {
+            val transition = currentState().findTransitionOn(event)
+            if (transition != null) {
+                if (transition.target != null) {
+                    val newState = states.find { it.id == transition.target }
+                    if (newState != null) {
+                        currentStateId = newState.id
+                        return true
+                    }
+                }
+            } else {
+                return currentState().send(event)
+            }
+        } else if (strategy == KSStrategyType.Internal) {
+            val eventHandled = currentState().send(event)
+            if (eventHandled) return true else {
+                val transition = currentState().findTransitionOn(event)
+                if (transition != null) {
+                    if (transition.target != null) {
+                        val newState = states.find { it.id == transition.target }
+                        if (newState != null) {
+                            currentStateId = newState.id
+                            return true
+                        }
+                    }
                 }
             }
-        } else {
-            currentState().send(event)
+            return false
         }
+        return false
     }
 
     fun activeStateIds(): List<KSStateId> {
@@ -45,7 +69,8 @@ open class KSMachine {
     }
 }
 
-class KSMachineBuilder : KSMachine() {
+class KSMachineBuilder(private val strategy: KSStrategyType) :
+    KSMachine(strategy) {
     fun initial(id: KSStateId) {
         initial = id
     }
@@ -55,7 +80,7 @@ class KSMachineBuilder : KSMachine() {
             throw AlreadyRegisteredStateId(id)
         }
 
-        val newState = createState(id, init)
+        val newState = createState(id, strategy, init)
         states = states.toMutableList().also { it.add(newState) }
     }
 
@@ -69,8 +94,11 @@ class KSMachineBuilder : KSMachine() {
     }
 }
 
-fun createMachine(init: KSMachineBuilder.() -> Unit): KSMachine {
-    val ksMachine = KSMachineBuilder()
+fun createMachine(
+    strategy: KSStrategyType = KSStrategyType.External,
+    init: KSMachineBuilder.() -> Unit
+): KSMachine {
+    val ksMachine = KSMachineBuilder(strategy)
     ksMachine.apply(init)
 
     ksMachine.build()

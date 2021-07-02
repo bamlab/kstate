@@ -2,7 +2,7 @@ package tech.bam
 
 import tech.bam.domain.exception.AlreadyRegisteredStateId
 
-open class KSState(val id: KSStateId) {
+open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
     // Protected API
     var transitions: Set<KSTransition> = setOf()
         protected set
@@ -33,24 +33,47 @@ open class KSState(val id: KSStateId) {
         return listOf()
     }
 
-    fun send(event: KSEvent) {
+    fun send(event: KSEvent): Boolean {
         if (isCompound()) {
-            val transition = currentState()!!.findTransitionOn(event)
-            if (transition != null) {
-                if (transition.target != null) {
-                    val newState = states.find { it.id == transition.target }
-                    if (newState != null) {
-                        currentStateId = newState.id
+            if (strategy == KSStrategyType.External) {
+                val transition = currentState()!!.findTransitionOn(event)
+                if (transition != null) {
+                    if (transition.target != null) {
+                        val newState = states.find { it.id == transition.target }
+                        if (newState != null) {
+                            currentStateId = newState.id
+                            return true
+                        }
+                    }
+                } else {
+                    return currentState()!!.send(event)
+                }
+            } else if (strategy == KSStrategyType.Internal) {
+                val eventHandled = currentState()!!.send(event)
+                if (eventHandled) return true else {
+                    val transition = currentState()!!.findTransitionOn(event)
+                    if (transition != null) {
+                        if (transition.target != null) {
+                            val newState = states.find { it.id == transition.target }
+                            if (newState != null) {
+                                currentStateId = newState.id
+                                return true
+                            }
+                        }
                     }
                 }
-            } else {
-                currentState()!!.send(event)
+                return false
             }
+            return false
         }
+        return false
     }
 }
 
-class KSStateBuilder(id: KSStateId) : KSState(id) {
+class KSStateBuilder(
+    id: KSStateId,
+    private val strategy: KSStrategyType
+) : KSState(id, strategy) {
     fun initial(id: KSStateId) {
         initial = id
     }
@@ -69,7 +92,7 @@ class KSStateBuilder(id: KSStateId) : KSState(id) {
             throw AlreadyRegisteredStateId(id)
         }
 
-        val newState = createState(id, init)
+        val newState = createState(id, strategy, init)
         states = states.toMutableList().also { it.add(newState) }
     }
 
@@ -81,8 +104,12 @@ class KSStateBuilder(id: KSStateId) : KSState(id) {
 }
 
 
-internal fun createState(id: KSStateId, init: KSStateBuilder.() -> Unit): KSState {
-    val ksState = KSStateBuilder(id)
+internal fun createState(
+    id: KSStateId,
+    strategy: KSStrategyType = KSStrategyType.External,
+    init: KSStateBuilder.() -> Unit
+): KSState {
+    val ksState = KSStateBuilder(id, strategy)
     ksState.apply(init)
 
     ksState.build()

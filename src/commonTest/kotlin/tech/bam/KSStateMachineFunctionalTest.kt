@@ -62,4 +62,73 @@ class KSStateMachineFunctionalTest {
 
         assertEquals(listOf(RED, WAIT), machine.activeStateIds())
     }
+
+    @Test
+    fun `it transitions between nested states with the external strategy by default`() {
+        val machine = createMachine {
+            initial(RED)
+            state(RED) {
+                transition(on = TIMER, target = YELLOW)
+
+                initial(WALK)
+                state(WALK) {
+                    transition(on = TIMER, target = WAIT)
+                }
+                state(WAIT)
+            }
+            state(YELLOW)
+        }
+
+        machine.send(TIMER)
+
+        assertEquals(listOf(YELLOW), machine.activeStateIds())
+    }
+
+    @Test
+    fun `it transitions between nested states with the internal strategy`() {
+        val machine = createMachine(strategy = KSStrategyType.Internal) {
+            initial(RED)
+            state(RED) {
+                transition(on = TIMER, target = YELLOW)
+
+                initial(WALK)
+                state(WALK) {
+                    transition(on = TIMER, target = WAIT)
+                }
+                state(WAIT)
+            }
+            state(YELLOW)
+        }
+
+        machine.send(TIMER)
+
+        assertEquals(listOf(RED, WAIT), machine.activeStateIds())
+    }
+
+    @Test
+    fun `it transitions between nested states with the internal global strategy`() {
+        val machine = createMachine(strategy = KSStrategyType.Internal) {
+            initial(RED)
+            state(RED) {
+                transition(on = TIMER, target = YELLOW)
+
+                initial(WALK)
+                state(WALK) {
+                    transition(on = TIMER, target = WAIT)
+
+                    initial(GREEN)
+                    state(GREEN) {
+                        transition(on = TIMER, target = YELLOW)
+                    }
+                    state(YELLOW)
+                }
+                state(WAIT)
+            }
+            state(YELLOW)
+        }
+
+        machine.send(TIMER)
+
+        assertEquals(listOf(RED, WALK, YELLOW), machine.activeStateIds())
+    }
 }
