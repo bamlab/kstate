@@ -6,8 +6,10 @@ import tech.bam.domain.exception.NoRegisteredStates
 open class KSMachine {
     // Protected API
     protected var states: List<KSState> = listOf()
-    var initial: KSStateId? = null
+    lateinit var initial: KSStateId
         protected set
+
+    protected fun isInitialInitialized() = ::initial.isInitialized
 
     // TODO: Implement parallels
     private var parallels: List<KSParallel> = listOf()
@@ -32,7 +34,7 @@ class KSMachineBuilder : KSMachine() {
     }
 
     fun build() {
-        if (initial == null) {
+        if (!isInitialInitialized()) {
             if (states.isEmpty()) throw NoRegisteredStates()
             initial = states[0].id
         }

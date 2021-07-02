@@ -13,7 +13,7 @@ enum class TrafficLightStateId : KSStateId {
 
 class KSMachineTest {
     @Test
-    fun `it should register states`() {
+    fun `it registers states`() {
         val machine = createMachine {
             state(RED)
             state(YELLOW)
@@ -26,7 +26,7 @@ class KSMachineTest {
     }
 
     @Test
-    fun `it should reject already registered states`() {
+    fun `it rejects already registered states`() {
         assertFailsWith<AlreadyRegisteredStateId> {
             createMachine {
                 state(RED)
@@ -37,7 +37,7 @@ class KSMachineTest {
     }
 
     @Test
-    fun `it should register an initial state`() {
+    fun `it registers an initial state`() {
         val machine = createMachine {
             initial(RED)
             state(RED)
