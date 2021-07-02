@@ -17,7 +17,7 @@ open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
     private val onEntry: () -> Unit = {}
     private val onExit: () -> Unit = {}
     private val parallels: List<KSParallel> = listOf()
-    private fun currentState(): KSState? = states.find { it.id == currentStateId }
+    protected open fun currentState(): KSState? = states.find { it.id == currentStateId }
 
     // Public API
     val stateIds: List<KSStateId>
@@ -33,40 +33,33 @@ open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
         return listOf()
     }
 
-    fun send(event: KSEvent): Boolean {
-        if (isCompound()) {
-            if (strategy == KSStrategyType.External) {
-                val transition = currentState()!!.findTransitionOn(event)
-                if (transition != null) {
-                    if (transition.target != null) {
-                        val newState = states.find { it.id == transition.target }
-                        if (newState != null) {
-                            currentStateId = newState.id
-                            return true
-                        }
-                    }
-                } else {
-                    return currentState()!!.send(event)
+    private fun handleEventWithTransition(event: KSEvent): Boolean {
+        val transition = currentState()!!.findTransitionOn(event)
+        if (transition != null) {
+            if (transition.target != null) {
+                val newState = states.find { it.id == transition.target }
+                if (newState != null) {
+                    currentStateId = newState.id
+                    return true
                 }
-            } else if (strategy == KSStrategyType.Internal) {
-                val eventHandled = currentState()!!.send(event)
-                if (eventHandled) return true else {
-                    val transition = currentState()!!.findTransitionOn(event)
-                    if (transition != null) {
-                        if (transition.target != null) {
-                            val newState = states.find { it.id == transition.target }
-                            if (newState != null) {
-                                currentStateId = newState.id
-                                return true
-                            }
-                        }
-                    }
-                }
-                return false
             }
-            return false
         }
         return false
+    }
+
+    private fun handleEventWithChildren(event: KSEvent) = currentState()!!.send(event)
+
+    fun send(event: KSEvent): Boolean = if (isCompound()) {
+        when (strategy) {
+            KSStrategyType.External -> {
+                handleEventWithTransition(event) || handleEventWithChildren(event)
+            }
+            KSStrategyType.Internal -> {
+                handleEventWithChildren(event) || handleEventWithTransition(event)
+            }
+        }
+    } else {
+        false
     }
 }
 
