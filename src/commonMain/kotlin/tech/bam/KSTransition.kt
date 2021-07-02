@@ -5,10 +5,50 @@ sealed class KSTransitionType {
     object Internal : KSTransitionType()
 }
 
-class KSTransition {
-    private val event: KSEvent? = null
+open class KSTransition {
+    // Protected API
+    var event: KSEvent? = null
+        protected set
+    var target: KSStateId? = null
+        protected set
+    var effect: () -> Unit = {}
+        protected set
+
+    // TODO : Implement those
     private val condition: Boolean = true
-    private val target: KSStateId? = null
     private val type: KSTransitionType = KSTransitionType.External
-    private val effect: () -> Unit = {}
+}
+
+internal class KSTransitionBuilder : KSTransition() {
+    fun setEvent(event: KSEvent?): KSTransitionBuilder {
+        this.event = event
+        return this
+    }
+
+    fun setTarget(target: KSStateId?): KSTransitionBuilder {
+        this.target = target
+        return this
+    }
+
+    fun setEffect(effect: (() -> Unit)): KSTransitionBuilder {
+        this.effect = effect
+        return this
+    }
+
+    fun build() {}
+}
+
+internal fun createTransition(
+    on: KSEvent? = null,
+    target: KSStateId? = null,
+    effect: (() -> Unit) = {}
+): KSTransition {
+    val ksTransition = KSTransitionBuilder()
+    ksTransition
+        .setEvent(on)
+        .setTarget(target)
+        .setEffect(effect)
+
+    ksTransition.build()
+    return ksTransition
 }

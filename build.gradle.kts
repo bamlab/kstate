@@ -22,7 +22,11 @@ val emptyJavadocJar by tasks.registering(Jar::class) {
 }
 
 kotlin {
-    jvm()
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = "1.8"
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -34,12 +38,14 @@ kotlin {
             dependencies {
                 implementation(kotlin("test-common"))
                 implementation(kotlin("test-annotations-common"))
+                implementation("io.mockk:mockk-common:1.12.0")
             }
         }
         val jvmTest by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
                 implementation("org.jetbrains.kotlin:kotlin-test-junit")
+                implementation("io.mockk:mockk:1.12.0")
             }
         }
     }
