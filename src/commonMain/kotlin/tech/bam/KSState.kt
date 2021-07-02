@@ -19,6 +19,8 @@ open class KSState(val id: KSStateId) {
     // Public API
     val stateIds: List<KSStateId>
         get() = states.map { it.id }
+
+    fun isCompound() = states.isNotEmpty()
 }
 
 internal class KSStateBuilder(id: KSStateId) : KSState(id) {

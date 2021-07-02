@@ -60,4 +60,14 @@ internal class KSStateTest {
 
         assertEquals(state.initial, FooStateId)
     }
+
+    @Test
+    fun `it is a compound state if it has children`() {
+        val state = createState(StubStateId) {
+            state(FooStateId)
+            state(BarStateId)
+        }
+
+        assertEquals(state.isCompound(), true)
+    }
 }
