@@ -1,17 +1,13 @@
 package tech.bam
 
-import tech.bam.TrafficLightStateId.*
 import tech.bam.domain.exception.AlreadyRegisteredStateId
 import tech.bam.domain.exception.NoRegisteredStates
+import tech.bam.domain.mockk.TrafficLightStateId.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-enum class TrafficLightStateId : KSStateId {
-    RED, YELLOW, GREEN
-}
-
-class KSMachineTest {
+class KSMachineUnitTest {
     @Test
     fun `it registers states`() {
         val machine = createMachine {

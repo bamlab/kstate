@@ -8,8 +8,9 @@ import kotlin.test.assertFailsWith
 object StubStateId : KSStateId
 object FooStateId : KSStateId
 object BarStateId : KSStateId
+object BazEvent : KSEvent
 
-internal class KSStateTest {
+internal class KSStateUnitTest {
     @Test
     fun `it registers transitions`() {
         val state = createState(StubStateId) {
@@ -26,7 +27,7 @@ internal class KSStateTest {
             state(BarStateId)
         }
 
-        assertEquals(state.stateIds, listOf(FooStateId, BarStateId))
+        assertEquals(listOf(FooStateId, BarStateId), state.stateIds)
     }
 
     @Test
@@ -48,7 +49,7 @@ internal class KSStateTest {
             state(BarStateId)
         }
 
-        assertEquals(state.initial, BarStateId)
+        assertEquals(BarStateId, state.initial)
     }
 
     @Test
@@ -58,7 +59,7 @@ internal class KSStateTest {
             state(BarStateId)
         }
 
-        assertEquals(state.initial, FooStateId)
+        assertEquals(FooStateId, state.initial)
     }
 
     @Test
@@ -68,6 +69,15 @@ internal class KSStateTest {
             state(BarStateId)
         }
 
-        assertEquals(state.isCompound(), true)
+        assertEquals(true, state.isCompound())
+    }
+
+    @Test
+    fun `it registers event transitions`() {
+        val state = createState(StubStateId) {
+            transition(on = BazEvent)
+        }
+
+        assertEquals(BazEvent, state.transitions.elementAt(0).event)
     }
 }

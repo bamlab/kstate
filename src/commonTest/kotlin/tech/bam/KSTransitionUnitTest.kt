@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 object FooEvent : KSEvent
 object FooState : KSStateId
 
-class KSTransitionTest {
+class KSTransitionUnitTest {
     @Test
     fun `it registers the event`() {
         val transition = createTransition(
@@ -33,7 +33,7 @@ class KSTransitionTest {
     fun `it registers the effect`() {
         val effect = mockk<() -> Unit>()
         every { effect() } returns Unit
-        
+
         val transition = createTransition(target = FooState) {
             effect()
         }
