@@ -6,8 +6,10 @@
 
 ## Install
 
+![Maven Central](https://img.shields.io/maven-central/v/tech.bam.kstate/kstate-jvm)
+
 ```groovy
-implementation("tech.bam:kstate-jvm:VERSION")
+implementation("tech.bam.kstate:kstate-jvm:VERSION")
 ```
 
 ### Snapshot releases
@@ -108,6 +110,38 @@ val machine = createMachine(strategy = KSStrategyType.Internal) {
 machine.send(TIMER)
 
 assertEquals(listOf(RED, WAIT), machine.activeStateIds())
+```
+
+### Parallel state machine
+
+```kotlin
+val machine = createMachine(type = Type.Parallel) {
+    state(TRAFFIC_LIGHT) {
+        initial(RED)
+        state(RED) {
+            transition(on = TIMER, target = GREEN)
+        }
+        state(GREEN) {
+            transition(on = TIMER, target = RED)
+        }
+    }
+    state(PEDESTRIAN_LIGHT) {
+        initial(WAIT)
+        state(WAIT) {
+            transition(on = TIMER, target = WALK)
+        }
+        state(WALK) {
+            transition(on = TIMER, target = WAIT)
+        }
+    }
+}
+
+machine.send(TIMER)
+
+assertEquals(
+    listOf(TRAFFIC_LIGHT, GREEN, PEDESTRIAN_LIGHT, WALK),
+    machine.activeStateIds()
+)
 ```
 
 ## Developed with IntelliJ IDEA

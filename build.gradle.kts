@@ -9,7 +9,7 @@ plugins {
     signing
 }
 
-group = "tech.bam"
+group = "tech.bam.kstate"
 version = "0.0.0-SNAPSHOT"
 
 repositories {
