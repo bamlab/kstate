@@ -2,7 +2,7 @@ package tech.bam
 
 import tech.bam.domain.exception.AlreadyRegisteredStateId
 import tech.bam.domain.exception.NoRegisteredStates
-import tech.bam.domain.mockk.TrafficLightStateId.*
+import tech.bam.domain.mock.TrafficLightStateId.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

@@ -1,10 +1,9 @@
 package tech.bam
 
-import tech.bam.domain.mockk.PedestrianLightStateId.WAIT
-import tech.bam.domain.mockk.PedestrianLightStateId.WALK
-import tech.bam.domain.mockk.TrafficLightEvent.SHORT_TIMER
-import tech.bam.domain.mockk.TrafficLightEvent.TIMER
-import tech.bam.domain.mockk.TrafficLightStateId.*
+import tech.bam.domain.mock.PedestrianLightStateId.*
+import tech.bam.domain.mock.TrafficLightEvent.SHORT_TIMER
+import tech.bam.domain.mock.TrafficLightEvent.TIMER
+import tech.bam.domain.mock.TrafficLightStateId.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -155,5 +154,36 @@ class KSStateMachineFunctionalTest {
         machine.send(TIMER)
 
         assertEquals(listOf(RED, WALK), machine.activeStateIds())
+    }
+
+    @Test
+    fun `it transitions in all parallel states`() {
+        val machine = createMachine {
+            state(TRAFFIC_LIGHT) {
+                initial(RED)
+                state(RED) {
+                    transition(on = TIMER, target = GREEN)
+                }
+                state(GREEN) {
+                    transition(on = TIMER, target = RED)
+                }
+            }
+            state(PEDESTRIAN_LIGHT) {
+                initial(WAIT)
+                state(WAIT) {
+                    transition(on = TIMER, target = WALK)
+                }
+                state(WALK) {
+                    transition(on = TIMER, target = WAIT)
+                }
+            }
+        }
+
+        machine.send(TIMER)
+
+        assertEquals(
+            listOf(TRAFFIC_LIGHT, GREEN, PEDESTRIAN_LIGHT, WALK),
+            machine.activeStateIds()
+        )
     }
 }

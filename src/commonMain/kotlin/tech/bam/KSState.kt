@@ -1,6 +1,7 @@
 package tech.bam
 
 import tech.bam.domain.exception.AlreadyRegisteredStateId
+import tech.bam.domain.exception.NoRegisteredStates
 
 open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
     // Protected API
@@ -16,7 +17,6 @@ open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
     // TODO: Implement the following
     private val onEntry: () -> Unit = {}
     private val onExit: () -> Unit = {}
-    private val parallels: List<KSParallel> = listOf()
     protected open fun currentState(): KSState? = states.find { it.id == currentStateId }
 
     // Public API
@@ -88,7 +88,11 @@ class KSStateBuilder(
         transitions = transitions.toMutableSet().also { it.add(newTransition) }
     }
 
-    fun state(id: KSStateId, init: KSStateBuilder.() -> Unit = {}) {
+    fun state(
+        id: KSStateId,
+        strategy: KSStrategyType = this.strategy,
+        init: KSStateBuilder.() -> Unit = {}
+    ) {
         if (states.find { it.id == id } != null) {
             throw AlreadyRegisteredStateId(id)
         }
@@ -98,6 +102,7 @@ class KSStateBuilder(
     }
 
     fun build() {
+        if (id == KSRoot && states.isEmpty()) throw NoRegisteredStates()
         if (initial == null && states.isNotEmpty())
             initial = states[0].id
         currentStateId = initial
