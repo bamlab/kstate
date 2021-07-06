@@ -27,11 +27,19 @@ open class State(val id: StateId, val type: Type, private val strategy: Strategy
     fun isCompound() = states.isNotEmpty()
     fun findTransitionOn(event: Event): Transition? = transitions.find { it.event == event }
     fun activeStateIds(): List<StateId> {
-        if (isCompound()) return listOf(
-            listOf(currentStateId!!),
-            currentState()!!.activeStateIds()
-        ).flatten()
-        return listOf()
+        return if (isCompound()) {
+            when (type) {
+                Type.Hierarchical ->
+                    listOf(
+                        listOf(currentStateId!!),
+                        currentState()!!.activeStateIds()
+                    ).flatten()
+                Type.Parallel -> states.map { listOf(it.id, *it.activeStateIds().toTypedArray()) }
+                    .flatten()
+            }
+        } else {
+            listOf()
+        }
     }
 
     private fun handleEventWithTransition(event: Event): Boolean {
@@ -56,7 +64,12 @@ open class State(val id: StateId, val type: Type, private val strategy: Strategy
         }
     }
 
-    private fun handleEventWithChildren(event: Event) = currentState()!!.send(event)
+    private fun handleEventWithChildren(event: Event): Boolean {
+        return when (type) {
+            Type.Hierarchical -> currentState()!!.send(event)
+            Type.Parallel -> states.map { it.send(event) }.any { it }
+        }
+    }
 
     fun send(event: Event): Boolean = if (isCompound()) {
         when (strategy) {
@@ -92,6 +105,7 @@ class StateBuilder(
 
     fun state(
         id: StateId,
+        type: Type = Type.Hierarchical,
         strategy: StrategyType = this.strategy,
         init: StateBuilder.() -> Unit = {}
     ) {
@@ -99,7 +113,7 @@ class StateBuilder(
             throw AlreadyRegisteredStateId(id)
         }
 
-        val newState = createState(id, strategy = strategy, init = init)
+        val newState = createState(id, type, strategy, init)
         states = states.toMutableList().also { it.add(newState) }
     }
 
