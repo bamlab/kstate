@@ -27,21 +27,21 @@ implementation("tech.bam:kstate-jvm:VERSION-SNAPSHOT")
 
 ### State ids and event declaration
 
-Extend the `KSStateId` and the `KSEvent` types.
+Extend the `StateId` and the `Event` types.
 
 ```kotlin
-sealed class TrafficLightStateId : KSStateId {
+sealed class TrafficLightStateId : StateId {
     object RED : TrafficLightStateId()
     object YELLOW : TrafficLightStateId()
     object GREEN : TrafficLightStateId()
 }
 
-sealed class TrafficLightEvent : KSEvent {
+sealed class TrafficLightEvent : Event {
     object TIMER : TrafficLightEvent()
     object SHORT_TIMER : TrafficLightEvent()
 }
 
-sealed class PedestrianLightStateId : KSStateId {
+sealed class PedestrianLightStateId : StateId {
     object WALK : PedestrianLightStateId()
     object WAIT : PedestrianLightStateId()
 }
@@ -142,6 +142,30 @@ assertEquals(
     listOf(TRAFFIC_LIGHT, GREEN, PEDESTRIAN_LIGHT, WALK),
     machine.activeStateIds()
 )
+```
+
+### Listen for transitions
+
+```kotlin
+val machine = createMachine {
+    initial(RED)
+    state(RED)
+    state(YELLOW)
+    state(GREEN)
+}
+
+val listener = MachineTransitionListener { previousActiveStateIds, nextActiveStateIds ->
+    print("I'm listening.")
+}
+
+machine.subscribe(listener)
+machine.unsubscribe(listener)
+
+// OR
+
+machine.onTransition { previousActiveStateIds, nextActiveStateIds ->
+    print("I'm listening.")
+}
 ```
 
 ## Developed with IntelliJ IDEA

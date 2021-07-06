@@ -1,5 +1,9 @@
 package tech.bam
 
+import io.mockk.confirmVerified
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import tech.bam.domain.mock.PedestrianLightStateId.*
 import tech.bam.domain.mock.TrafficLightEvent.SHORT_TIMER
 import tech.bam.domain.mock.TrafficLightEvent.TIMER
@@ -185,5 +189,47 @@ class StateMachineFunctionalTest {
             listOf(TRAFFIC_LIGHT, GREEN, PEDESTRIAN_LIGHT, WALK),
             machine.activeStateIds()
         )
+    }
+
+    @Test
+    fun `it calls listeners with previous and next active state ids`() {
+        val effect =
+            mockk<(previousActiveStateIds: List<StateId>, nextActiveStateIds: List<StateId>) -> Unit>()
+        every { effect(any(), any()) } returns Unit
+
+        val machine = createMachine(type = Type.Parallel) {
+            state(TRAFFIC_LIGHT) {
+                initial(RED)
+                state(RED) {
+                    transition(on = TIMER, target = GREEN)
+                }
+                state(GREEN) {
+                    transition(on = TIMER, target = RED)
+                }
+            }
+            state(PEDESTRIAN_LIGHT) {
+                initial(WAIT)
+                state(WAIT) {
+                    transition(on = TIMER, target = WALK)
+                }
+                state(WALK) {
+                    transition(on = TIMER, target = WAIT)
+                }
+            }
+        }
+
+        machine.onTransition { prev, next ->
+            effect(prev, next)
+        }
+
+        machine.send(TIMER)
+
+        verify {
+            effect(
+                listOf(TRAFFIC_LIGHT, RED, PEDESTRIAN_LIGHT, WAIT),
+                listOf(TRAFFIC_LIGHT, GREEN, PEDESTRIAN_LIGHT, WALK)
+            )
+        }
+        confirmVerified(effect)
     }
 }
