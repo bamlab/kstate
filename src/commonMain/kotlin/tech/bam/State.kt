@@ -21,7 +21,8 @@ open class State(val id: StateId, val type: Type, private val strategy: Strategy
     var listeners: List<MachineTransitionListener> = listOf()
         private set
 
-    protected open fun currentState(): State? = states.find { it.id == currentStateId }
+    private fun currentState(): State? = states.find { it.id == currentStateId }
+
 
     // Public API
     val stateIds: List<StateId>
@@ -118,10 +119,23 @@ class StateBuilder(
     type: Type,
     private val strategy: StrategyType
 ) : State(id, type, strategy) {
+    /**
+     * Sets the initial state.
+     * This it not used when type is [Type.Parallel].
+     *
+     * @param id the initial state id.
+     */
     fun initial(id: StateId) {
         initial = id
     }
 
+    /**
+     * Declare a transition.
+     *
+     * @param on the event the state should react to.
+     * @param target the target [StateId].
+     * @param effect a side effect called when transition is used.
+     */
     fun transition(
         on: Event? = null,
         target: StateId? = null,
@@ -131,6 +145,19 @@ class StateBuilder(
         transitions = transitions.toMutableSet().also { it.add(newTransition) }
     }
 
+    /**
+     * Declare a child transition.
+     * Doing so, the current state becomes a compound state.
+     *
+     * @param id the [StateId] of the child.
+     * @param type the type of the state machine. Either [Type.Hierarchical] or [Type.Parallel].
+     * @param strategy the strategy of the state machine.
+     *  Either [StrategyType.External] or [StrategyType.Internal].
+     *  *kstate* introduces [StrategyType] concept. Default to [StrategyType.External].
+     *  When set to [StrategyType.Internal], events are handled by children first, and
+     *  then the compound state.
+     * @param init use *kstate*'s DSL to declare your state machine.
+     */
     fun state(
         id: StateId,
         type: Type = Type.Hierarchical,
@@ -145,6 +172,9 @@ class StateBuilder(
         states = states.toMutableList().also { it.add(newState) }
     }
 
+    /**
+     * Check state machine declaration. You should *NOT* call this function yourself.
+     */
     fun build() {
         if (id == RootStateId && states.isEmpty()) throw NoRegisteredStates()
         if (initial == null && states.isNotEmpty())

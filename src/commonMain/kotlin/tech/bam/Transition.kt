@@ -11,6 +11,8 @@ open class Transition {
         protected set
     var target: StateId? = null
         protected set
+
+    // TODO: Implement this.
     var effect: () -> Unit = {}
         protected set
 
