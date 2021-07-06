@@ -34,17 +34,25 @@ open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
     }
 
     private fun handleEventWithTransition(event: KSEvent): Boolean {
-        val transition = currentState()!!.findTransitionOn(event)
+        val currentState = currentState()!!
+        val transition = currentState.findTransitionOn(event)
         if (transition != null) {
             if (transition.target != null) {
                 val newState = states.find { it.id == transition.target }
                 if (newState != null) {
+                    currentState.restart()
                     currentStateId = newState.id
                     return true
                 }
             }
         }
         return false
+    }
+
+    private fun restart() {
+        if (isCompound()) {
+            currentStateId = initial
+        }
     }
 
     private fun handleEventWithChildren(event: KSEvent) = currentState()!!.send(event)

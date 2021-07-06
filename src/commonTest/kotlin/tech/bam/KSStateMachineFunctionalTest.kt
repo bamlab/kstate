@@ -131,4 +131,29 @@ class KSStateMachineFunctionalTest {
 
         assertEquals(listOf(RED, WALK, YELLOW), machine.activeStateIds())
     }
+
+    @Test
+    fun `its compound state is in initial state when reentering a compound state`() {
+        val machine = createMachine {
+            initial(RED)
+            state(RED) {
+                transition(on = TIMER, target = GREEN)
+
+                initial(WALK)
+                state(WALK) {
+                    transition(on = SHORT_TIMER, target = WAIT)
+                }
+                state(WAIT)
+            }
+            state(GREEN) {
+                transition(on = TIMER, target = RED)
+            }
+        }
+
+        machine.send(SHORT_TIMER)
+        machine.send(TIMER)
+        machine.send(TIMER)
+
+        assertEquals(listOf(RED, WALK), machine.activeStateIds())
+    }
 }
