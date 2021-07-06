@@ -5,12 +5,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-object StubStateId : KSStateId
-object FooStateId : KSStateId
-object BarStateId : KSStateId
-object BazEvent : KSEvent
+object StubStateId : StateId
+object FooStateId : StateId
+object BarStateId : StateId
+object BazEvent : Event
 
-internal class KSStateUnitTest {
+internal class StateUnitTest {
     @Test
     fun `it registers transitions`() {
         val state = createState(StubStateId) {
@@ -79,5 +79,15 @@ internal class KSStateUnitTest {
         }
 
         assertEquals(BazEvent, state.transitions.elementAt(0).event)
+    }
+
+    @Test
+    fun `it registers type`() {
+        val state = createState(StubStateId, type = Type.Parallel) {
+            state(FooStateId)
+            state(BarStateId)
+        }
+
+        assertEquals(Type.Parallel, state.type)
     }
 }

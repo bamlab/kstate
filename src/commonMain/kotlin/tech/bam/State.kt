@@ -1,31 +1,32 @@
 package tech.bam
 
+import tech.bam.domain.constants.RootStateId
 import tech.bam.domain.exception.AlreadyRegisteredStateId
 import tech.bam.domain.exception.NoRegisteredStates
 
-open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
+open class State(val id: StateId, val type: Type, private val strategy: StrategyType) {
     // Protected API
-    var transitions: Set<KSTransition> = setOf()
+    var transitions: Set<Transition> = setOf()
         protected set
-    protected var states: List<KSState> = listOf()
-    var initial: KSStateId? = null
+    protected var states: List<State> = listOf()
+    var initial: StateId? = null
         protected set
-    var currentStateId: KSStateId? = null
+    var currentStateId: StateId? = null
         protected set
 
     // Private API
     // TODO: Implement the following
     private val onEntry: () -> Unit = {}
     private val onExit: () -> Unit = {}
-    protected open fun currentState(): KSState? = states.find { it.id == currentStateId }
+    protected open fun currentState(): State? = states.find { it.id == currentStateId }
 
     // Public API
-    val stateIds: List<KSStateId>
+    val stateIds: List<StateId>
         get() = states.map { it.id }
 
     fun isCompound() = states.isNotEmpty()
-    fun findTransitionOn(event: KSEvent): KSTransition? = transitions.find { it.event == event }
-    fun activeStateIds(): List<KSStateId> {
+    fun findTransitionOn(event: Event): Transition? = transitions.find { it.event == event }
+    fun activeStateIds(): List<StateId> {
         if (isCompound()) return listOf(
             listOf(currentStateId!!),
             currentState()!!.activeStateIds()
@@ -33,7 +34,7 @@ open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
         return listOf()
     }
 
-    private fun handleEventWithTransition(event: KSEvent): Boolean {
+    private fun handleEventWithTransition(event: Event): Boolean {
         val currentState = currentState()!!
         val transition = currentState.findTransitionOn(event)
         if (transition != null) {
@@ -55,14 +56,14 @@ open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
         }
     }
 
-    private fun handleEventWithChildren(event: KSEvent) = currentState()!!.send(event)
+    private fun handleEventWithChildren(event: Event) = currentState()!!.send(event)
 
-    fun send(event: KSEvent): Boolean = if (isCompound()) {
+    fun send(event: Event): Boolean = if (isCompound()) {
         when (strategy) {
-            KSStrategyType.External -> {
+            StrategyType.External -> {
                 handleEventWithTransition(event) || handleEventWithChildren(event)
             }
-            KSStrategyType.Internal -> {
+            StrategyType.Internal -> {
                 handleEventWithChildren(event) || handleEventWithTransition(event)
             }
         }
@@ -71,17 +72,18 @@ open class KSState(val id: KSStateId, private val strategy: KSStrategyType) {
     }
 }
 
-class KSStateBuilder(
-    id: KSStateId,
-    private val strategy: KSStrategyType
-) : KSState(id, strategy) {
-    fun initial(id: KSStateId) {
+class StateBuilder(
+    id: StateId,
+    type: Type,
+    private val strategy: StrategyType
+) : State(id, type, strategy) {
+    fun initial(id: StateId) {
         initial = id
     }
 
     fun transition(
-        on: KSEvent? = null,
-        target: KSStateId? = null,
+        on: Event? = null,
+        target: StateId? = null,
         effect: (() -> Unit) = {}
     ) {
         val newTransition = createTransition(on, target, effect)
@@ -89,20 +91,20 @@ class KSStateBuilder(
     }
 
     fun state(
-        id: KSStateId,
-        strategy: KSStrategyType = this.strategy,
-        init: KSStateBuilder.() -> Unit = {}
+        id: StateId,
+        strategy: StrategyType = this.strategy,
+        init: StateBuilder.() -> Unit = {}
     ) {
         if (states.find { it.id == id } != null) {
             throw AlreadyRegisteredStateId(id)
         }
 
-        val newState = createState(id, strategy, init)
+        val newState = createState(id, strategy = strategy, init = init)
         states = states.toMutableList().also { it.add(newState) }
     }
 
     fun build() {
-        if (id == KSRoot && states.isEmpty()) throw NoRegisteredStates()
+        if (id == RootStateId && states.isEmpty()) throw NoRegisteredStates()
         if (initial == null && states.isNotEmpty())
             initial = states[0].id
         currentStateId = initial
@@ -111,13 +113,13 @@ class KSStateBuilder(
 
 
 internal fun createState(
-    id: KSStateId,
-    strategy: KSStrategyType = KSStrategyType.External,
-    init: KSStateBuilder.() -> Unit
-): KSState {
-    val ksState = KSStateBuilder(id, strategy)
-    ksState.apply(init)
-
-    ksState.build()
-    return ksState
+    id: StateId,
+    type: Type = Type.Hierarchical,
+    strategy: StrategyType = StrategyType.External,
+    init: StateBuilder .() -> Unit
+): State {
+    val state = StateBuilder(id, type, strategy)
+    state.apply(init)
+    state.build()
+    return state
 }

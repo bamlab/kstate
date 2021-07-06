@@ -7,10 +7,10 @@ import io.mockk.verify
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-object FooEvent : KSEvent
-object FooState : KSStateId
+object FooEvent : Event
+object FooState : StateId
 
-class KSTransitionUnitTest {
+class TransitionUnitTest {
     @Test
     fun `it registers the event`() {
         val transition = createTransition(

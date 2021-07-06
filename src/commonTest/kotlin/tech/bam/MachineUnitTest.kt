@@ -7,7 +7,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class KSMachineUnitTest {
+class MachineUnitTest {
     @Test
     fun `it registers states`() {
         val machine = createMachine {

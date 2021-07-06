@@ -7,7 +7,7 @@ import tech.bam.domain.mock.TrafficLightStateId.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class KSStateMachineFunctionalTest {
+class StateMachineFunctionalTest {
     @Test
     fun `it transitions between states`() {
         val machine = createMachine {
@@ -85,7 +85,7 @@ class KSStateMachineFunctionalTest {
 
     @Test
     fun `it transitions between nested states with the internal strategy`() {
-        val machine = createMachine(strategy = KSStrategyType.Internal) {
+        val machine = createMachine(strategy = StrategyType.Internal) {
             initial(RED)
             state(RED) {
                 transition(on = TIMER, target = YELLOW)
@@ -106,7 +106,7 @@ class KSStateMachineFunctionalTest {
 
     @Test
     fun `it transitions between nested states with the internal global strategy`() {
-        val machine = createMachine(strategy = KSStrategyType.Internal) {
+        val machine = createMachine(strategy = StrategyType.Internal) {
             initial(RED)
             state(RED) {
                 transition(on = TIMER, target = YELLOW)
@@ -158,7 +158,7 @@ class KSStateMachineFunctionalTest {
 
     @Test
     fun `it transitions in all parallel states`() {
-        val machine = createMachine {
+        val machine = createMachine(type = Type.Parallel) {
             state(TRAFFIC_LIGHT) {
                 initial(RED)
                 state(RED) {
