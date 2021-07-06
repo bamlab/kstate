@@ -20,7 +20,7 @@ repositories {
 }
 // ...
 
-implementation("tech.bam:kstate-jvm:VERSION-SNAPSHOT")
+implementation("tech.bam.kstate:kstate-jvm:VERSION-SNAPSHOT")
 ```
 
 ## Usage
