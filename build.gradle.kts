@@ -113,6 +113,7 @@ afterEvaluate {
 }
 
 nexusStaging {
+    packageGroup = "tech.bam"
     username = properties["sonatypeUsername"].toString()
     password = properties["sonatypePassword"].toString()
 }
