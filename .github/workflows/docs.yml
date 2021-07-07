@@ -1,13 +1,10 @@
-name: Continuous Deployment
+name: Docs
 
 on:
   push:
     branches: [master]
     paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - ".vscode/**"
-      - "README.md"
+      - "src/**"
 
 jobs:
   build:
@@ -15,9 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Fetch tags
-        run: git fetch --unshallow --tags
 
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
@@ -33,21 +27,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Test with Gradle
-        run: ./gradlew jvmTest
-
-      - name: Setup version
-        run: |
-          sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
-          git describe --abbrev=7 --tags --always --first-parent
-
-      - name: Publish
-        run: gradle publish
-        env:
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
-          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD }}
-          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME }}
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install git+https://${GH_TOKEN}@github.com/bamlab/mkdocs-material-insiders.git
+      - run: pip install mkdocs-git-revision-date-localized-plugin
+      - run: mkdocs gh-deploy --force
 
       - name: Build docs
         run: ./gradlew dokkaHtml

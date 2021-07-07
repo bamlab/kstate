@@ -134,9 +134,9 @@ tasks.withType<DokkaTask>().configureEach {
                 remoteUrl.set(URL("https://github.com/bamlab/api/kstate/blob/master/src/commonMain/kotlin"))
                 remoteLineSuffix.set("#L")
             }
-            // externalDocumentationLink {
-            //     url.set(URL("https://bamlab.github.io/kstate/api/kstate/"))
-            // }
+            externalDocumentationLink {
+                url.set(URL("https://bamlab.github.io/kstate/api/kstate/"))
+            }
         }
     }
 }

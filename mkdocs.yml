@@ -4,6 +4,7 @@ nav:
   - quickstart.md
   - guides/index.md
   - api.md
+  - about.md
 theme:
   name: material
   logo: assets/logo.svg
