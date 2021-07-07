@@ -44,6 +44,13 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME }}
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install git+https://${GH_TOKEN}@github.com/bamlab/mkdocs-material-insiders.git
+      - run: pip install mkdocs-git-revision-date-localized-plugin
+      - run: mkdocs gh-deploy --force
+
       - name: Build docs
         run: ./gradlew dokkaHtml
         if: github.ref == 'refs/heads/master'
@@ -56,3 +63,6 @@ jobs:
           branch: gh-pages
           folder: build/dokka
           target-folder: api
+
+env:
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
