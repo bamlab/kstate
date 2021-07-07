@@ -128,7 +128,6 @@ tasks.withType<DokkaTask>().configureEach {
     dokkaSourceSets {
         named("commonMain") {
             samples.from("README.md")
-            includes.from("index.md")
             sourceLink {
                 localDirectory.set(file("src/commonMain/kotlin"))
                 remoteUrl.set(URL("https://github.com/bamlab/api/kstate/blob/master/src/commonMain/kotlin"))

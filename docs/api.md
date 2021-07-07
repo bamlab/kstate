@@ -2,4 +2,4 @@
 
 The API has its own website.
 
-Please head to [/api/kstate](/api/kstate/).
+Please head to [/kstate/api/kstate](/kstate/api/kstate/).
