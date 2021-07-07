@@ -1,4 +1,4 @@
-name: JVM Continuous Deployment
+name: Continuous Deployment and Docs Builder
 
 on:
   push:
