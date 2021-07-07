@@ -131,11 +131,11 @@ tasks.withType<DokkaTask>().configureEach {
             includes.from("index.md")
             sourceLink {
                 localDirectory.set(file("src/commonMain/kotlin"))
-                remoteUrl.set(URL("https://github.com/bamlab/kstate/blob/master/src/commonMain/kotlin"))
+                remoteUrl.set(URL("https://github.com/bamlab/api/kstate/blob/master/src/commonMain/kotlin"))
                 remoteLineSuffix.set("#L")
             }
             externalDocumentationLink {
-                url.set(URL("https://bamlab.github.io/kstate/kstate/"))
+                url.set(URL("https://bamlab.github.io/kstate/api/kstate/"))
             }
         }
     }
