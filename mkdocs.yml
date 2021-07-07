@@ -34,7 +34,7 @@ theme:
 extra_css:
   - css/extra.css
 repo_url: https://github.com/bamlab/kstate
-edit_uri: edit/main/docs/
+edit_uri: edit/master/docs/
 extra:
   generator: false
   social:
