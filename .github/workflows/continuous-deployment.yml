@@ -50,10 +50,6 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.4
         if: github.ref == 'refs/heads/master'
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
           folder: build/dokkaMultiModuleOutput
           target-folder: api
-
-env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}
