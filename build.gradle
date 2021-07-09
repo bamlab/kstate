@@ -46,7 +46,7 @@ allprojects {
 apply plugin: "org.jetbrains.dokka"
 
 dokkaHtmlMultiModule.configure {
-    outputDirectory.set(file("build/dokkaCustomMultiModuleOutput"))
+    outputDirectory.set(file("build/dokkaMultiModuleOutput"))
 }
 
 // Gradle-Nexus

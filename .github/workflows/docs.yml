@@ -35,7 +35,7 @@ jobs:
       - run: mkdocs gh-deploy --force
 
       - name: Build docs
-        run: ./gradlew dokkaHtml
+        run: ./gradlew dokkaHtmlMultiModule
         if: github.ref == 'refs/heads/master'
 
       - name: Publish docs
@@ -44,7 +44,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          folder: build/dokka
+          folder: build/dokkaMultiModuleOutput
           target-folder: api
 
 env:
