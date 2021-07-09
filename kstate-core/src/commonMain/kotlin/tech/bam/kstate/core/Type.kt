@@ -1,4 +1,4 @@
-package tech.bam
+package tech.bam.kstate.core
 
 sealed class Type {
     object Hierarchical : Type()

@@ -1,13 +1,13 @@
-package tech.bam
+package tech.bam.kstate.core
 
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import tech.bam.domain.mock.PedestrianLightStateId.*
-import tech.bam.domain.mock.TrafficLightEvent.SHORT_TIMER
-import tech.bam.domain.mock.TrafficLightEvent.TIMER
-import tech.bam.domain.mock.TrafficLightStateId.*
+import tech.bam.kstate.core.domain.mock.PedestrianLightStateId.*
+import tech.bam.kstate.core.domain.mock.TrafficLightEvent.SHORT_TIMER
+import tech.bam.kstate.core.domain.mock.TrafficLightEvent.TIMER
+import tech.bam.kstate.core.domain.mock.TrafficLightStateId.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

@@ -1,4 +1,4 @@
-package tech.bam
+package tech.bam.kstate.core
 
 import io.mockk.confirmVerified
 import io.mockk.every

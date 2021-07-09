@@ -1,5 +1,5 @@
-package tech.bam.domain.exception
+package tech.bam.kstate.core.domain.exception
 
-import tech.bam.StateId
+import tech.bam.kstate.core.StateId
 
 class AlreadyRegisteredStateId(id: StateId) : Error("State with id $id is already registered.")

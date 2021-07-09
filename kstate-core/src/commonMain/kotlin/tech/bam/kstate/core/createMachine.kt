@@ -1,6 +1,6 @@
-package tech.bam
+package tech.bam.kstate.core
 
-import tech.bam.domain.constants.RootStateId
+import tech.bam.kstate.core.domain.constants.RootStateId
 
 /**
  * Creates a *finite state machine*.

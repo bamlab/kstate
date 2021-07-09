@@ -1,6 +1,6 @@
-package tech.bam
+package tech.bam.kstate.core
 
-import tech.bam.domain.exception.AlreadyRegisteredStateId
+import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

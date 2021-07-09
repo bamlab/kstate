@@ -1,8 +1,8 @@
-package tech.bam
+package tech.bam.kstate.core
 
-import tech.bam.domain.constants.RootStateId
-import tech.bam.domain.exception.AlreadyRegisteredStateId
-import tech.bam.domain.exception.NoRegisteredStates
+import tech.bam.kstate.core.domain.constants.RootStateId
+import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
+import tech.bam.kstate.core.domain.exception.NoRegisteredStates
 
 open class State(val id: StateId, val type: Type, private val strategy: StrategyType) {
     // Protected API

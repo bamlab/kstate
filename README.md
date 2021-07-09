@@ -9,7 +9,7 @@
 ![Maven Central](https://img.shields.io/maven-central/v/tech.bam.kstate/kstate-jvm)
 
 ```groovy
-implementation("tech.bam.kstate:kstate-jvm:VERSION")
+implementation("tech.bam.kstate:kstate-core:VERSION")
 ```
 
 ### Snapshot releases
@@ -20,7 +20,7 @@ repositories {
 }
 // ...
 
-implementation("tech.bam.kstate:kstate-jvm:VERSION-SNAPSHOT")
+implementation("tech.bam.kstate:kstate-core:VERSION-SNAPSHOT")
 ```
 
 ## Usage

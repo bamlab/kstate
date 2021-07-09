@@ -1,7 +1,7 @@
-package tech.bam.domain.mock
+package tech.bam.kstate.core.domain.mock
 
-import tech.bam.Event
-import tech.bam.StateId
+import tech.bam.kstate.core.Event
+import tech.bam.kstate.core.StateId
 
 sealed class TrafficLightStateId : StateId {
     object TRAFFIC_LIGHT : TrafficLightStateId()

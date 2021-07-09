@@ -1,4 +1,4 @@
-package tech.bam
+package tech.bam.kstate.core
 
 class MachineTransitionListener(
     val callback: (

@@ -1,12 +1,12 @@
-package tech.bam
+package tech.bam.kstate.core
 
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import tech.bam.domain.exception.AlreadyRegisteredStateId
-import tech.bam.domain.exception.NoRegisteredStates
-import tech.bam.domain.mock.TrafficLightStateId.*
+import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
+import tech.bam.kstate.core.domain.exception.NoRegisteredStates
+import tech.bam.kstate.core.domain.mock.TrafficLightStateId.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
