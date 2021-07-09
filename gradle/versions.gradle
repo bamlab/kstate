@@ -6,7 +6,7 @@ ext {
     kotlin_version = "1.4.30"
 
     // Dokka
-    dokka_version = "0.10.1"
+    dokka_version = "1.5.0"
 
     // MockK
     mockk_version = "1.12.0"

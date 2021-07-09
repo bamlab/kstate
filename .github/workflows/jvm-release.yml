@@ -36,7 +36,7 @@ jobs:
           git describe --abbrev=0 --tags
 
       - name: Publish
-        run: gradle publish
+        run: gradle publishAllPublicationsToStagingRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}

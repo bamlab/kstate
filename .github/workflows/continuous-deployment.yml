@@ -39,7 +39,7 @@ jobs:
           git describe --abbrev=7 --tags --always --first-parent
 
       - name: Publish
-        run: gradle publish
+        run: gradle publishAllPublicationsToSnapshotRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}

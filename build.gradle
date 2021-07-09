@@ -35,16 +35,21 @@ allprojects {
 
     // Dokka
     apply plugin: "org.jetbrains.dokka"
-    dokka {
-        outputFormat = "html"
-        outputDirectory = "$buildDir/javadoc"
-    }
+
     task dokkaJar(type: Jar) {
         classifier = "javadoc"
-        from dokka
+        from dokkaJavadoc
     }
 }
 
+// Dokka
+apply plugin: "org.jetbrains.dokka"
+
+dokkaHtmlMultiModule.configure {
+    outputDirectory.set(file("build/dokkaCustomMultiModuleOutput"))
+}
+
+// Gradle-Nexus
 apply plugin: "io.github.gradle-nexus.publish-plugin"
 
 nexusPublishing {
