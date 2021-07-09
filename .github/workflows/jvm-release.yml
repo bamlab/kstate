@@ -36,7 +36,7 @@ jobs:
           git describe --abbrev=0 --tags
 
       - name: Publish
-        run: gradle publishAllPublicationsToStagingRepository
+        run: ./gradlew publishAllPublicationsToStagingRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
@@ -45,7 +45,7 @@ jobs:
           ORG_GRADLE_PROJECT_isReleaseBuild: true
 
       - name: Close and Release staging repository
-        run: gradle closeAndReleaseStagingRepository
+        run: ./gradlew closeAndReleaseStagingRepository
         env:
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME }}
