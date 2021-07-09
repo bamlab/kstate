@@ -32,7 +32,7 @@ jobs:
 
       - name: Setup version for release
         run: |
-          sed -i -E "s/0.0.0-SNAPSHOT/$(git describe --abbrev=0 --tags)/" ./build.gradle.kts
+          sed -i -E "s/0.0.0-SNAPSHOT/$(git describe --abbrev=0 --tags)/" ./gradle/versions.gradle
           git describe --abbrev=0 --tags
 
       - name: Publish
@@ -45,7 +45,7 @@ jobs:
           ORG_GRADLE_PROJECT_isReleaseBuild: true
 
       - name: Close and Release staging repository
-        run: gradle closeAndReleaseRepository
+        run: gradle closeAndReleaseStagingRepository
         env:
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME }}

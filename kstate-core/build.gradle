@@ -1,0 +1,38 @@
+apply plugin: 'org.jetbrains.kotlin.multiplatform'
+
+archivesBaseName = 'kstate-core'
+
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = "1.8"
+        }
+        withJava()
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                api kotlin("stdlib-common")
+            }
+        }
+
+        commonTest {
+            dependencies {
+                implementation kotlin("test-common")
+                implementation kotlin("test-annotations-common")
+                implementation "io.mockk:mockk-common:$mockk_version"
+            }
+        }
+
+        jvmTest {
+            dependencies {
+                implementation kotlin("stdlib")
+                implementation "org.jetbrains.kotlin:kotlin-test-junit"
+                implementation "io.mockk:mockk:$mockk_version"
+            }
+        }
+    }
+}
+
+apply from: '../gradle/publish-to-central.gradle'

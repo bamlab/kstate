@@ -1,0 +1,121 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+def isReleaseBuild() {
+    return (properties["isReleaseBuild"] == "true")
+}
+
+def getRepositoryUsername() {
+    return properties["sonatypeUsername"].toString()
+}
+
+def getRepositoryPassword() {
+    return properties["sonatypePassword"].toString()
+}
+
+def getSigningKey() {
+    return properties["signingKey"]?.toString()?.replace("\\n", "\n")
+}
+
+def getSigningPassword() {
+    return properties["signingPassword"]?.toString()
+}
+
+if (!project.tasks.findByName('sourcesJar')) {
+    task sourcesJar(type: Jar) {
+        archiveClassifier.set('sources')
+        if (pluginManager.hasPlugin('com.android.library')) {
+            from android.sourceSets.main.java.srcDirs
+        } else {
+            from sourceSets.main.java.srcDirs
+        }
+    }
+}
+
+artifacts {
+    archives dokkaJar
+    archives sourcesJar
+}
+
+afterEvaluate {
+    publishing {
+        repositories {
+            maven {
+                name "snapshot"
+                url = "https://oss.sonatype.org/content/repositories/snapshots"
+                credentials {
+                    username = getRepositoryUsername()
+                    password = getRepositoryPassword()
+                }
+            }
+            maven {
+                name "staging"
+                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                credentials {
+                    username = getRepositoryUsername()
+                    password = getRepositoryPassword()
+                }
+            }
+        }
+
+        if (!pluginManager.hasPlugin('org.jetbrains.kotlin.multiplatform')) {
+            publications {
+                release(MavenPublication) {
+                    if (pluginManager.hasPlugin('com.android.library')) {
+                        from components.release
+                    } else {
+                        from components.java
+                    }
+                    artifact sourcesJar
+                    artifactId = project.name
+                }
+            }
+        }
+
+        publications.all {
+            artifact dokkaJar
+
+            pom.withXml {
+                def root = asNode()
+
+                root.children().last() + {
+                    resolveStrategy = DELEGATE_FIRST
+
+                    description "KSTATE - A Kotlin Multiplatform library for creating state machines"
+                    name project.name
+                    url "https://bamlab.github.io/kstate/"
+                    licenses {
+                        license {
+                            name "MIT License"
+                            url "https://opensource.org/licenses/MIT"
+                        }
+                    }
+                    scm {
+                        url "https://github.com/bamlab/kstate"
+                        connection "scm:git:https://github.com/bamlab/kstate"
+                        developerConnection "scm:git:https://github.com/bamlab/kstate"
+                    }
+                    developers {
+                        developer {
+                            id "tpucci"
+                            name "Thomas Pucci"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (isReleaseBuild()) {
+        signing {
+            useInMemoryPgpKeys(getSigningKey(), getSigningPassword())
+            if (pluginManager.hasPlugin('org.jetbrains.kotlin.multiplatform')) {
+                publishing.publications.all {
+                    sign it
+                }
+            } else {
+                sign publishing.publications.release
+            }
+        }
+    }
+}

@@ -1,0 +1,16 @@
+ext {
+    // Kstate
+    kstate_version = "0.0.0-SNAPSHOT"
+
+    // Kotlin
+    kotlin_version = "1.4.30"
+
+    // Dokka
+    dokka_version = "0.10.1"
+
+    // MockK
+    mockk_version = "1.12.0"
+
+    // Gradle Nexus
+    gradle_nexus_version = "1.1.0"
+}

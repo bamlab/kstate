@@ -2,12 +2,9 @@ name: Continuous Deployment
 
 on:
   push:
-    branches: [master]
-    paths-ignore:
-      - "docs/**"
-      - "mkdocs.yml"
-      - ".vscode/**"
-      - "README.md"
+    branches: [ master ]
+    paths:
+      - "kstate-core/**"
 
 jobs:
   build:
@@ -38,7 +35,7 @@ jobs:
 
       - name: Setup version
         run: |
-          sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./build.gradle.kts
+          sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./gradle/versions.gradle
           git describe --abbrev=7 --tags --always --first-parent
 
       - name: Publish
