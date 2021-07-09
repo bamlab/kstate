@@ -45,3 +45,6 @@ jobs:
           branch: gh-pages
           folder: build/dokkaMultiModuleOutput
           target-folder: api
+
+env:
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
