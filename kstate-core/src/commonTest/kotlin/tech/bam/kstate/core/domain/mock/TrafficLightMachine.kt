@@ -3,6 +3,7 @@ package tech.bam.kstate.core.domain.mock
 import tech.bam.kstate.core.Event
 import tech.bam.kstate.core.StateId
 
+
 sealed class TrafficLightStateId : StateId {
     object TRAFFIC_LIGHT : TrafficLightStateId()
     object RED : TrafficLightStateId()

@@ -2,6 +2,6 @@ package tech.bam.kstate.core
 
 class MachineTransitionListener(
     val callback: (
-        previousActiveStateIds: List<StateId>, nextActiveStateIds: List<StateId>
+        previousActiveStateIds: List<StateIdWithContext<out Context>>, nextActiveStateIds: List<StateIdWithContext<out Context>>
     ) -> Unit
 )

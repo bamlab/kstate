@@ -14,6 +14,7 @@ class TransitionUnitTest {
     @Test
     fun `it registers the event`() {
         val transition = createTransition(
+            target = FooState,
             on = FooEvent
         )
 

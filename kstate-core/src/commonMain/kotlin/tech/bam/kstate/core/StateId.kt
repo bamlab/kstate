@@ -1,3 +1,5 @@
 package tech.bam.kstate.core
 
-interface StateId
+interface StateId : StateIdWithContext<Context>
+
+interface StateIdWithContext<C : Context>

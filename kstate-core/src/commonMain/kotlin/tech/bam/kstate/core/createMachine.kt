@@ -17,5 +17,12 @@ import tech.bam.kstate.core.domain.constants.RootStateId
 fun createMachine(
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
-    init: StateBuilder.() -> Unit
-): State = createState(RootStateId, type, strategy, init)
+    init: StateBuilder<Context>.() -> Unit
+): State<Context> = createState(RootStateId(), type, strategy, init)
+
+fun <C : Context> createMachine(
+    id: StateIdWithContext<C>,
+    type: Type = Type.Hierarchical,
+    strategy: StrategyType = StrategyType.External,
+    init: StateBuilder<C>.() -> Unit
+): State<C> = createState(id, type, strategy, init)

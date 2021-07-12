@@ -5,11 +5,11 @@ sealed class TransitionType {
     object Internal : TransitionType()
 }
 
-open class Transition {
+open class Transition<C : Context> {
     // Protected API
     var event: Event? = null
         protected set
-    var target: StateId? = null
+    var target: StateIdWithContext<C>? = null
         protected set
 
     // TODO: Implement this.
@@ -21,29 +21,29 @@ open class Transition {
     private val type: TransitionType = TransitionType.External
 }
 
-internal class TransitionBuilder : Transition() {
-    fun setEvent(event: Event?): TransitionBuilder {
+internal class TransitionBuilder<C : Context> : Transition<C>() {
+    fun setEvent(event: Event?): TransitionBuilder<C> {
         this.event = event
         return this
     }
 
-    fun setTarget(target: StateId?): TransitionBuilder {
+    fun setTarget(target: StateIdWithContext<C>?): TransitionBuilder<C> {
         this.target = target
         return this
     }
 
-    fun setEffect(effect: (() -> Unit)): TransitionBuilder {
+    fun setEffect(effect: (() -> Unit)): TransitionBuilder<C> {
         this.effect = effect
         return this
     }
 }
 
-internal fun createTransition(
+internal fun <C : Context> createTransition(
     on: Event? = null,
-    target: StateId? = null,
+    target: StateIdWithContext<C>? = null,
     effect: (() -> Unit) = {}
-): Transition {
-    val transition = TransitionBuilder()
+): Transition<C> {
+    val transition = TransitionBuilder<C>()
     transition
         .setEvent(on)
         .setTarget(target)
