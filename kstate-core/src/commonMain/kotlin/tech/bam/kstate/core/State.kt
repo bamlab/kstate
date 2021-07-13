@@ -4,6 +4,7 @@ import tech.bam.kstate.core.domain.constants.RootStateId
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
 import tech.bam.kstate.core.domain.exception.NoRegisteredStates
 import tech.bam.kstate.core.domain.exception.UninitializedContext
+import kotlin.reflect.KClass
 
 open class State<C : Context>(
     val id: StateIdWithContext<C>,
@@ -11,7 +12,7 @@ open class State<C : Context>(
     private val strategy: StrategyType
 ) {
     // Protected API
-    var transitions: Set<Transition<out Context>> = setOf()
+    var transitions: Set<Transition<out Context, out Event>> = setOf()
         protected set
     protected var states: List<State<out Context>> = listOf()
     var initial: StateIdWithContext<out Context>? = null
@@ -30,7 +31,11 @@ open class State<C : Context>(
     var listeners: List<MachineTransitionListener> = listOf()
         private set
 
-    private fun currentState(): State<out Context>? = states.find { it.id == currentStateId }
+    private fun currentState(): State<out Context>? =
+        states.find { it.id == currentStateId }
+
+    private fun findStateWithId(stateId: StateIdWithContext<out Context>): State<out Context>? =
+        states.find { it.id == stateId }
 
 
     // Public API
@@ -38,8 +43,12 @@ open class State<C : Context>(
         get() = states.map { it.id }
 
     fun isCompound() = states.isNotEmpty()
-    fun findTransitionOn(event: Event): Transition<out Context>? =
-        transitions.find { it.event == event }
+    fun <E : Event> findTransitionOn(event: E): Transition<out Context, E>? {
+        val transition = transitions.find { it.event == event || it.eventClass == event::class }
+        return if (transition == null) null else
+            @Suppress("UNCHECKED_CAST")
+            transition as Transition<out Context, E>
+    }
 
     fun activeStateIds(): List<StateIdWithContext<out Context>> {
         return if (isCompound()) {
@@ -65,6 +74,7 @@ open class State<C : Context>(
                 val newState = states.find { it.id == transition.target }
                 if (newState != null) {
                     currentState.restart()
+                    newState.start(transition.effect(event))
                     currentStateId = newState.id
                     return true
                 }
@@ -77,6 +87,11 @@ open class State<C : Context>(
         if (isCompound()) {
             currentStateId = initial
         }
+    }
+
+    private fun start(context: Context) {
+        @Suppress("UNCHECKED_CAST")
+        this.context = context as C
     }
 
     private fun handleEventWithChildren(event: Event): Boolean {
@@ -126,6 +141,27 @@ open class State<C : Context>(
         val newListener = MachineTransitionListener(callback)
         subscribe(newListener)
     }
+
+    fun activeStateIdsWithContext(): List<Pair<StateIdWithContext<out Context>, Context>> {
+        return if (isCompound()) {
+            when (type) {
+                Type.Hierarchical ->
+                    listOf(
+                        listOf(Pair(currentStateId!!, currentState()!!.context)),
+                        currentState()!!.activeStateIdsWithContext()
+                    ).flatten()
+                Type.Parallel -> states.map {
+                    listOf(
+                        Pair(it.id, findStateWithId(it.id)!!.context),
+                        *it.activeStateIdsWithContext().toTypedArray()
+                    )
+                }
+                    .flatten()
+            }
+        } else {
+            listOf()
+        }
+    }
 }
 
 class StateBuilder<C : Context>(
@@ -152,8 +188,33 @@ class StateBuilder<C : Context>(
      */
     fun transition(
         on: Event? = null,
-        target: StateIdWithContext<C>? = null,
+        target: StateId? = null,
         effect: (() -> Unit) = {}
+    ) {
+        val newTransition = createTransition(on, target, effect)
+        transitions = transitions.toMutableSet().also { it.add(newTransition) }
+    }
+
+    /**
+     * Declare a transition.
+     *
+     * @param on the event the state should react to.
+     * @param target the target [StateId].
+     * @param effect a side effect called when transition is used. It should return a context for the given target.
+     */
+    fun <C : Context> transition(
+        on: Event? = null,
+        target: StateIdWithContext<C>,
+        effect: (() -> C)
+    ) {
+        val newTransition = createTransition(on, target, effect)
+        transitions = transitions.toMutableSet().also { it.add(newTransition) }
+    }
+
+    fun <C : Context, E : Event> transition(
+        on: KClass<E>,
+        target: StateIdWithContext<C>,
+        effect: ((event: E) -> C)
     ) {
         val newTransition = createTransition(on, target, effect)
         transitions = transitions.toMutableSet().also { it.add(newTransition) }

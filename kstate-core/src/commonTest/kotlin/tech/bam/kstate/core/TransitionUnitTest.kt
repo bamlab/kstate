@@ -9,6 +9,8 @@ import kotlin.test.assertEquals
 
 object FooEvent : Event
 object FooState : StateId
+interface BarContext : Context
+object ContextualBarState : StateIdWithContext<BarContext>
 
 class TransitionUnitTest {
     @Test
@@ -39,7 +41,22 @@ class TransitionUnitTest {
             effect()
         }
 
-        transition.effect()
+        transition.effect(object : Event {})
+        verify { effect() }
+        confirmVerified(effect)
+    }
+
+    @Test
+    fun `it registers the effect on a contextual state`() {
+        val effect = mockk<() -> Unit>()
+        every { effect() } returns Unit
+
+        val transition = createTransition(target = ContextualBarState) {
+            effect()
+            object : BarContext {}
+        }
+
+        transition.effect(object : Event {})
         verify { effect() }
         confirmVerified(effect)
     }

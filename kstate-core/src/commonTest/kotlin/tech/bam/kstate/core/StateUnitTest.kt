@@ -15,15 +15,6 @@ object BazEvent : Event
 
 internal class StateUnitTest {
     @Test
-    fun `it registers transitions`() {
-        val state = createState(StubStateId) {
-            transition()
-        }
-
-        assertEquals(1, state.transitions.size)
-    }
-
-    @Test
     fun `it registers states`() {
         val state = createState(StubStateId) {
             state(FooStateId)
