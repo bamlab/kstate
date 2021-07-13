@@ -121,7 +121,7 @@ class MachineUnitTest {
             effect(prev, next)
         }
 
-        machine.listeners[0].callback(listOf(), listOf())
+        (machine.listeners[0] as MachineTransitionListener).callback(listOf(), listOf())
 
         verify { effect(listOf(), listOf()) }
         confirmVerified(effect)

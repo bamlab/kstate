@@ -28,7 +28,7 @@ open class State<C : Context>(
     // TODO: Implement the following
     private val onEntry: () -> Unit = {}
     private val onExit: () -> Unit = {}
-    var listeners: List<MachineTransitionListener> = listOf()
+    var listeners: List<TransitionListener> = listOf()
         private set
 
     private fun currentState(): State<out Context>? =
@@ -114,7 +114,7 @@ open class State<C : Context>(
     }
 
     fun send(event: Event): Boolean {
-        val previousActiveStateIds = activeStateIds()
+        val previousActiveStateWithContextIds = activeStateIdsWithContext()
         val result = if (isCompound()) {
             when (strategy) {
                 StrategyType.External -> {
@@ -128,31 +128,44 @@ open class State<C : Context>(
             false
         }
         if (result) {
-            val nextActiveStateIds = activeStateIds()
-            notify(previousActiveStateIds, nextActiveStateIds)
+            val nextActiveStateWithContextIds = activeStateIdsWithContext()
+            notify(previousActiveStateWithContextIds, nextActiveStateWithContextIds)
         }
         return result
     }
 
     private fun notify(
-        prev: List<StateIdWithContext<out Context>>,
-        next: List<StateIdWithContext<out Context>>
+        prev: List<StateIdWithContextPair<*>>,
+        next: List<StateIdWithContextPair<*>>
     ) {
-        listeners.forEach { it.callback(prev, next) }
+        listeners.forEach {
+            when (it) {
+                is MachineTransitionListener -> {
+                    it.callback(
+                        prev.map { p -> p.stateIdWithContext },
+                        next.map { p -> p.stateIdWithContext })
+                }
+                is MachineTransitionWithContextListener -> it.callback(prev, next)
+            }
+        }
     }
 
-    fun subscribe(listener: MachineTransitionListener) {
+    fun subscribe(listener: TransitionListener) {
         listeners = listeners.toMutableList().also { it.add(listener) }
     }
 
-    fun unsubscribe(listener: MachineTransitionListener) {
+    fun unsubscribe(listener: TransitionListener) {
         listeners = listeners.toMutableList().also { it.remove(listener) }
     }
 
     fun onTransition(callback: (previousActiveStateIds: List<StateIdWithContext<out Context>>, nextActiveStateIds: List<StateIdWithContext<out Context>>) -> Unit) {
         val newListener = MachineTransitionListener(callback)
         subscribe(newListener)
-        callback(listOf(), activeStateIds())
+    }
+
+    fun onTransitionWithContext(callback: (prev: List<StateIdWithContextPair<*>>, next: List<StateIdWithContextPair<*>>) -> Unit) {
+        val newListener = MachineTransitionWithContextListener(callback)
+        subscribe(newListener)
     }
 
     fun activeStateIdsWithContext(): List<StateIdWithContextPair<*>> {

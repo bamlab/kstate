@@ -3,18 +3,20 @@ package tech.bam.kstate.example.android_nav
 import androidx.fragment.app.Fragment
 import tech.bam.kstate.core.*
 
-interface ScreenInterface {
-    val fragment: Class<out Fragment>
+interface ScreenInterface<C : Context> {
+    val fragmentFactory: (context: C) -> Fragment
 }
 
 class LoggedInContext(val userId: String) : Context
 
-class Screen(override val fragment: Class<out Fragment>) : StateId, ScreenInterface
-class ScreenWithContext<C : Context>(override val fragment: Class<out Fragment>) :
-    StateIdWithContext<C>, ScreenInterface
+class Screen(override val fragmentFactory: (context: Context) -> Fragment) : StateId,
+    ScreenInterface<Context>
 
-val Welcome = Screen(WelcomeFragment::class.java)
-val LoggedIn = ScreenWithContext<LoggedInContext>(LoggedInFragment::class.java)
+class ScreenWithContext<C : Context>(override val fragmentFactory: (context: C) -> Fragment) :
+    StateIdWithContext<C>, ScreenInterface<C>
+
+val Welcome = Screen { WelcomeFragment() }
+val LoggedIn = ScreenWithContext<LoggedInContext> { c -> LoggedInFragment(c.userId) }
 
 class LogIn(val userId: String) : Event
 object LogOut : Event
@@ -42,11 +44,31 @@ class Navigator(private val mainActivity: MainActivity) {
     }
 
     fun start() {
-        machine.onTransition { _, _ ->
+        machine.onTransitionWithContext { _, next ->
             val fragmentTransaction = mainActivity.supportFragmentManager.beginTransaction()
-            val currentStateId = machine.currentStateId
-            if (currentStateId is ScreenInterface) {
-                fragmentTransaction.replace(R.id.root, currentStateId.fragment, null)
+            val statePair = next.last()
+            val screen = statePair.stateIdWithContext
+            val context = statePair.context
+            if (screen is ScreenInterface<*>) {
+                fragmentTransaction.replace(
+                    R.id.root,
+                    @Suppress("UNCHECKED_CAST")
+                    (screen as ScreenInterface<Context>).fragmentFactory(context)
+                )
+            }
+            fragmentTransaction.commit()
+        }
+
+        mainActivity.supportFragmentManager.beginTransaction().also {
+            val fragmentTransaction = mainActivity.supportFragmentManager.beginTransaction()
+            val screen = machine.currentStateId
+            val context = machine.context
+            if (screen is ScreenInterface<*>) {
+                fragmentTransaction.replace(
+                    R.id.root,
+                    @Suppress("UNCHECKED_CAST")
+                    (screen as ScreenInterface<Context>).fragmentFactory(context)
+                )
             }
             fragmentTransaction.commit()
         }
