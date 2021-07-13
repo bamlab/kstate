@@ -25,12 +25,7 @@ class ContextualStateMachineFunctionalTest {
                     effect = insertToCreditCardInsideTheATMContextFactory
                 )
             }
-            state(ChooseAmount) {
-                // FIXME
-                context(object : CreditCardInsideTheATMContext {
-                    override val clientId = "None"
-                })
-            }
+            state(ChooseAmount)
         }
 
         machine.send(InsertCreditCard("Thomas"))

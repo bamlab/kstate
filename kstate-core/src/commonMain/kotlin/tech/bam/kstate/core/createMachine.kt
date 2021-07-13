@@ -18,11 +18,11 @@ fun createMachine(
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
     init: StateBuilder<Context>.() -> Unit
-): State<Context> = createState(RootStateId(), type, strategy, init)
+): State<Context> = createState(RootStateId(), type, strategy, init).also { it.start() }
 
 fun <C : Context> createMachine(
     id: StateIdWithContext<C>,
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
     init: StateBuilder<C>.() -> Unit
-): State<C> = createState(id, type, strategy, init)
+): State<C> = createState(id, type, strategy, init).also { it.start() }

@@ -90,7 +90,7 @@ internal class StateUnitTest {
         assertFailsWith<UninitializedContext> {
             createState(MyStateIdWithContext) {
                 state(FooStateId)
-            }
+            }.start()
         }
     }
 

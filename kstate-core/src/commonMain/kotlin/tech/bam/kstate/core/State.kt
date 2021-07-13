@@ -89,9 +89,21 @@ open class State<C : Context>(
         }
     }
 
-    private fun start(context: Context) {
-        @Suppress("UNCHECKED_CAST")
-        this.context = context as C
+    fun start(context: Context? = null) {
+        if (context != null) {
+            @Suppress("UNCHECKED_CAST")
+            this.context = context as C
+        }
+        if (!this.isContextInitialized()) {
+            if (id is StateId) {
+                // When `id` is of type StateId, this means that C is Context.
+                @Suppress("UNCHECKED_CAST")
+                this.context = (context ?: object : Context {}) as C
+            } else {
+                throw UninitializedContext(id)
+            }
+        }
+        currentState()?.start()
     }
 
     private fun handleEventWithChildren(event: Event): Boolean {
@@ -264,15 +276,6 @@ class StateBuilder<C : Context>(
         if (initial == null && states.isNotEmpty())
             initial = states[0].id
         currentStateId = initial
-        if (!this.isContextInitialized()) {
-            if (id is StateId) {
-                // When `id` is of type StateId, this means that C is Context.
-                @Suppress("UNCHECKED_CAST")
-                context(object : Context {} as C)
-            } else {
-                throw UninitializedContext(id)
-            }
-        }
     }
 }
 
