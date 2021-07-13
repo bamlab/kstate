@@ -103,7 +103,10 @@ open class State<C : Context>(
                 throw UninitializedContext(id)
             }
         }
-        currentState()?.start()
+        when (type) {
+            Type.Hierarchical -> currentState()?.start()
+            Type.Parallel -> states.forEach { it.start() }
+        }
     }
 
     private fun handleEventWithChildren(event: Event): Boolean {
