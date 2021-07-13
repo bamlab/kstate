@@ -32,7 +32,7 @@ class ContextualStateMachineFunctionalTest {
 
         assertEquals(
             "Thomas",
-            (machine.activeStateIdsWithContext()[0].second as CreditCardInsideTheATMContext).clientId
+            (machine.activeStateIdsWithContext()[0].context as CreditCardInsideTheATMContext).clientId
         )
     }
 }

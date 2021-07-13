@@ -154,17 +154,27 @@ open class State<C : Context>(
         subscribe(newListener)
     }
 
-    fun activeStateIdsWithContext(): List<Pair<StateIdWithContext<out Context>, Context>> {
+    fun activeStateIdsWithContext(): List<StateIdWithContextPair<*>> {
         return if (isCompound()) {
             when (type) {
                 Type.Hierarchical ->
                     listOf(
-                        listOf(Pair(currentStateId!!, currentState()!!.context)),
+                        @Suppress("UNCHECKED_CAST")
+                        listOf(
+                            StateIdWithContextPair(
+                                currentStateId!! as StateIdWithContext<Context>,
+                                currentState()!!.context
+                            )
+                        ),
                         currentState()!!.activeStateIdsWithContext()
                     ).flatten()
                 Type.Parallel -> states.map {
                     listOf(
-                        Pair(it.id, findStateWithId(it.id)!!.context),
+                        @Suppress("UNCHECKED_CAST")
+                        StateIdWithContextPair(
+                            it.id as StateIdWithContext<Context>,
+                            findStateWithId(it.id)!!.context
+                        ),
                         *it.activeStateIdsWithContext().toTypedArray()
                     )
                 }
