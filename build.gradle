@@ -17,7 +17,7 @@ buildscript {
         // Gradle-Nexus
         classpath "io.github.gradle-nexus:publish-plugin:$gradle_nexus_version"
         // Android
-        classpath "com.android.tools.build:gradle:4.2.0"
+        classpath "com.android.tools.build:gradle:${android_gradle_plugin_version}"
     }
 }
 

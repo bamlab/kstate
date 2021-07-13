@@ -152,6 +152,7 @@ open class State<C : Context>(
     fun onTransition(callback: (previousActiveStateIds: List<StateIdWithContext<out Context>>, nextActiveStateIds: List<StateIdWithContext<out Context>>) -> Unit) {
         val newListener = MachineTransitionListener(callback)
         subscribe(newListener)
+        callback(listOf(), activeStateIds())
     }
 
     fun activeStateIdsWithContext(): List<StateIdWithContextPair<*>> {
