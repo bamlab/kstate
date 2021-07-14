@@ -1,0 +1,29 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+archivesBaseName = 'kstate-android-navigation'
+
+android {
+    compileSdkVersion android_target_version
+    buildToolsVersion android_build_tools_version
+
+    defaultConfig {
+        minSdkVersion android_min_version
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+dependencies {
+    implementation project(":kstate-core")
+
+    implementation "androidx.appcompat:appcompat:$androidx_appcompat_version"
+    implementation "androidx.fragment:fragment-ktx:$androidx_fragment_version"
+
+    testImplementation "io.mockk:mockk:$mockk_version"
+}
+
+apply from: '../gradle/publish-to-central.gradle'

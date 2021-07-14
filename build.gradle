@@ -57,6 +57,7 @@ apply plugin: "io.github.gradle-nexus.publish-plugin"
 nexusPublishing {
     repositories {
         sonatype {
+            stagingProfileId = "tech.bam"
             username = properties["sonatypeUsername"].toString()
             password = properties["sonatypePassword"].toString()
         }

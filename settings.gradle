@@ -1,2 +1,3 @@
 include "kstate-core"
 include ":example:android-nav"
+include ":kstate-android-navigation"

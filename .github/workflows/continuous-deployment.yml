@@ -29,11 +29,6 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew jvmTest
 
-      - name: Setup version
-        run: |
-          sed -i -E "s/0.0.0/$(git describe --abbrev=7 --tags --always --first-parent)/" ./gradle/versions.gradle
-          git describe --abbrev=7 --tags --always --first-parent
-
       - name: Publish
         run: ./gradlew publishAllPublicationsToSnapshotRepository
         env:
