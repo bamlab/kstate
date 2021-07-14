@@ -1,9 +1,8 @@
 package tech.bam.kstate.core
 
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
-import tech.bam.kstate.core.domain.exception.UninitializedContext
 import tech.bam.kstate.core.domain.mock.MyContext
-import tech.bam.kstate.core.domain.mock.MyStateIdWithContext
+import tech.bam.kstate.core.domain.mock.MyStateId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -86,20 +85,11 @@ internal class StateUnitTest {
     }
 
     @Test
-    fun `it throws when context is undefined`() {
-        assertFailsWith<UninitializedContext> {
-            createState(MyStateIdWithContext) {
-                state(FooStateId)
-            }.start()
-        }
-    }
-
-    @Test
     fun `it registers a context`() {
         val context = object : MyContext {
             override val myBoolean = true
         }
-        val state = createState(MyStateIdWithContext) {
+        val state = createContextState<MyContext>(MyStateId) {
             context(context)
             state(FooStateId)
         }

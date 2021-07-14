@@ -9,13 +9,13 @@ import kotlin.test.assertEquals
 
 object FooEvent : Event
 object FooState : StateId
-interface BarContext : Context
-object ContextualBarState : StateIdWithContext<BarContext>
+interface BarContext
+object ContextualBarState : StateId
 
 class TransitionUnitTest {
     @Test
     fun `it registers the event`() {
-        val transition = createTransition(
+        val transition = createTransition<Nothing>(
             target = FooState,
             on = FooEvent
         )
@@ -25,7 +25,7 @@ class TransitionUnitTest {
 
     @Test
     fun `it registers the target`() {
-        val transition = createTransition(
+        val transition = createTransition<Nothing>(
             target = FooState
         )
 
@@ -37,7 +37,7 @@ class TransitionUnitTest {
         val effect = mockk<() -> Unit>()
         every { effect() } returns Unit
 
-        val transition = createTransition(target = FooState) {
+        val transition = createTransition<Nothing>(target = FooState) {
             effect()
         }
 
@@ -51,7 +51,7 @@ class TransitionUnitTest {
         val effect = mockk<() -> Unit>()
         every { effect() } returns Unit
 
-        val transition = createTransition(target = ContextualBarState) {
+        val transition = createTransition<Nothing>(target = ContextualBarState) {
             effect()
             object : BarContext {}
         }

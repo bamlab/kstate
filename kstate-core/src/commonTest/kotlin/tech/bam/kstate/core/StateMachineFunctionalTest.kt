@@ -194,7 +194,7 @@ class StateMachineFunctionalTest {
     @Test
     fun `it calls listeners with previous and next active state ids`() {
         val effect =
-            mockk<(previousActiveStateIds: List<StateIdWithContext<out Context>>, nextActiveStateIds: List<StateIdWithContext<out Context>>) -> Unit>()
+            mockk<(previousActiveStateIds: List<StateId>, nextActiveStateIds: List<StateId>) -> Unit>()
         every { effect(any(), any()) } returns Unit
 
         val machine = createMachine(type = Type.Parallel) {

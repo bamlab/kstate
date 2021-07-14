@@ -1,10 +1,8 @@
 package tech.bam.kstate.core
 
-interface StateId : StateIdWithContext<Context>
+interface StateId
 
-interface StateIdWithContext<C : Context>
-
-data class StateIdWithContextPair<C : Context>(
-    val stateIdWithContext: StateIdWithContext<C>,
-    val context: C
+data class StateIdWithContextPair<C : Any>(
+    val stateIdWithContext: StateId,
+    val context: C?
 )

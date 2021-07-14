@@ -2,43 +2,33 @@ package tech.bam.kstate.example.android_nav
 
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import tech.bam.kstate.core.*
+import tech.bam.kstate.core.Event
+import tech.bam.kstate.core.StateId
+import tech.bam.kstate.core.Type
+import tech.bam.kstate.core.createContextMachine
 
-interface ScreenInterface<C : Context> {
-    val fragmentFactory: (context: C) -> Fragment
-}
-
-class LoggedInContext(val userId: String) : Context
-
-class Screen(override val fragmentFactory: (context: Context) -> Fragment) : StateId,
-    ScreenInterface<Context>
-
-class ScreenWithContext<C : Context>(override val fragmentFactory: (context: C) -> Fragment) :
-    StateIdWithContext<C>, ScreenInterface<C>
-
-val Welcome = Screen { WelcomeFragment() }
-val LoggedIn = ScreenWithContext<LoggedInContext> { c -> LoggedInFragment(c.userId) }
+object Welcome : StateId
+object LoggedIn : StateId
+object Base : StateId
+object Dialog : StateId
+object Gone : StateId
+object Visible : StateId
 
 class LogIn(val userId: String) : Event
 object LogOut : Event
 object Hide : Event
 
-object Base : StateId
-object Dialog : StateId
-
-object Gone : StateId
-
-val Visible = ScreenWithContext<LoggedInContext> { c -> VisibleDialogFragment(c.userId) }
 
 class Navigator(private val mainActivity: MainActivity) {
-    private val machine = createMachine(type = Type.Parallel) {
+    private val machine = createContextMachine<Fragment>(type = Type.Parallel) {
         state(Base) {
             initial(Welcome)
             state(Welcome) {
+                context(WelcomeFragment())
                 transition(
                     on = LogIn::class,
                     target = LoggedIn,
-                    effect = { event -> LoggedInContext(event.userId) })
+                    effect = { event -> LoggedInFragment(event.userId) })
             }
             state(LoggedIn) {
                 transition(on = LogOut, target = Welcome)
@@ -50,7 +40,7 @@ class Navigator(private val mainActivity: MainActivity) {
                 transition(
                     on = LogIn::class,
                     target = Visible,
-                    effect = { event -> LoggedInContext(event.userId) })
+                    effect = { event -> VisibleDialogFragment(event.userId) })
             }
             state(Visible) {
                 transition(on = Hide, target = Gone)
@@ -73,36 +63,28 @@ class Navigator(private val mainActivity: MainActivity) {
     fun start() {
         machine.onTransitionWithContext { _, next ->
             val fragmentTransaction = mainActivity.supportFragmentManager.beginTransaction()
-            val statePair = next.last { it.stateIdWithContext is ScreenInterface<*> }
-            val screen = statePair.stateIdWithContext
-            val context = statePair.context
-            if (screen is ScreenInterface<*>) {
-                @Suppress("UNCHECKED_CAST")
-                val fragment = (screen as ScreenInterface<Context>).fragmentFactory(context)
-                if (fragment is DialogFragment) {
-                    fragment.show(mainActivity.supportFragmentManager, fragment.tag)
-                } else
-                    fragmentTransaction.replace(
-                        R.id.root,
-                        fragment
-                    )
-            }
+            val fragment = next.last { it.context is Fragment }.context
+            if (fragment is DialogFragment) {
+                fragment.show(mainActivity.supportFragmentManager, fragment.tag)
+            } else if (fragment is Fragment)
+                fragmentTransaction.replace(
+                    R.id.root,
+                    fragment
+                )
             fragmentTransaction.commitAllowingStateLoss()
         }
 
         mainActivity.supportFragmentManager.beginTransaction().also {
-            val next = machine.activeStateIdsWithContext()
             val fragmentTransaction = mainActivity.supportFragmentManager.beginTransaction()
-            val statePair = next.last { it.stateIdWithContext is ScreenInterface<*> }
-            val screen = statePair.stateIdWithContext
-            val context = statePair.context
-            if (screen is ScreenInterface<*>) {
+            val fragment =
+                machine.activeStateIdsWithContext().last { it.context is Fragment }.context
+            if (fragment is DialogFragment) {
+                fragment.show(mainActivity.supportFragmentManager, fragment.tag)
+            } else if (fragment is Fragment)
                 fragmentTransaction.replace(
                     R.id.root,
-                    @Suppress("UNCHECKED_CAST")
-                    (screen as ScreenInterface<Context>).fragmentFactory(context)
+                    fragment
                 )
-            }
             fragmentTransaction.commitAllowingStateLoss()
         }
     }

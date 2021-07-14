@@ -6,9 +6,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
 import tech.bam.kstate.core.domain.exception.NoRegisteredStates
-import tech.bam.kstate.core.domain.exception.UninitializedContext
 import tech.bam.kstate.core.domain.mock.MyContext
-import tech.bam.kstate.core.domain.mock.MyStateIdWithContext
+import tech.bam.kstate.core.domain.mock.MyStateId
 import tech.bam.kstate.core.domain.mock.TrafficLightStateId.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -76,7 +75,7 @@ class MachineUnitTest {
             state(GREEN)
         }
 
-        val listener = MachineTransitionListener { _, _ ->
+        val listener = MachineTransitionListener<Nothing> { _, _ ->
             print("I'm listening.")
         }
 
@@ -94,7 +93,7 @@ class MachineUnitTest {
             state(GREEN)
         }
 
-        val listener = MachineTransitionListener { _, _ ->
+        val listener = MachineTransitionListener<Nothing> { _, _ ->
             print("I'm listening.")
         }
 
@@ -107,7 +106,7 @@ class MachineUnitTest {
     @Test
     fun `it creates a listener`() {
         val effect =
-            mockk<(previousActiveStateIds: List<StateIdWithContext<out Context>>, nextActiveStateIds: List<StateIdWithContext<out Context>>) -> Unit>()
+            mockk<(previousActiveStateIds: List<StateId>, nextActiveStateIds: List<StateId>) -> Unit>()
         every { effect(any(), any()) } returns Unit
 
         val machine = createMachine {
@@ -128,20 +127,11 @@ class MachineUnitTest {
     }
 
     @Test
-    fun `it throws when context is undefined`() {
-        assertFailsWith<UninitializedContext> {
-            createMachine(MyStateIdWithContext) {
-                state(FooStateId)
-            }
-        }
-    }
-
-    @Test
     fun `it registers a context`() {
         val context = object : MyContext {
             override val myBoolean = true
         }
-        val state = createMachine(MyStateIdWithContext) {
+        val state = createContextMachine<MyContext>(MyStateId) {
             context(context)
             state(FooStateId)
         }

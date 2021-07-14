@@ -20,7 +20,7 @@ class ContextualStateMachineFunctionalTest {
                     override val clientId = insertCreditCardEvent.clientId
                 }
             }
-        val machine = createMachine {
+        val machine = createContextMachine<CreditCardInsideTheATMContext> {
             initial(Welcome)
             state(Welcome) {
                 transition(
@@ -46,13 +46,16 @@ class ContextualStateMachineFunctionalTest {
             mockk<(p: List<StateIdWithContextPair<*>>, n: List<StateIdWithContextPair<*>>) -> Unit>()
         every { effect(any(), any()) } returns Unit
 
+        var createdContext: CreditCardInsideTheATMContext? = null
+
         val insertToCreditCardInsideTheATMContextFactory =
             { insertCreditCardEvent: InsertCreditCard ->
-                object : CreditCardInsideTheATMContext {
+                createdContext = object : CreditCardInsideTheATMContext {
                     override val clientId = insertCreditCardEvent.clientId
                 }
+                createdContext as CreditCardInsideTheATMContext
             }
-        val machine = createMachine {
+        val machine = createContextMachine<CreditCardInsideTheATMContext> {
             initial(Welcome)
             state(Welcome) {
                 transition(
@@ -70,8 +73,8 @@ class ContextualStateMachineFunctionalTest {
 
         verify {
             effect(
-                any(),
-                any()
+                listOf(StateIdWithContextPair(Welcome, null)),
+                listOf(StateIdWithContextPair(ChooseAmount, createdContext))
             )
         }
         confirmVerified(effect)

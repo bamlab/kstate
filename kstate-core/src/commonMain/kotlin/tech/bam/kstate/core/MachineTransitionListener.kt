@@ -1,15 +1,15 @@
 package tech.bam.kstate.core
 
-interface TransitionListener
+interface TransitionListener<C : Any>
 
-class MachineTransitionListener(
+class MachineTransitionListener<C : Any>(
     val callback: (
-        previousActiveStateIds: List<StateIdWithContext<out Context>>, nextActiveStateIds: List<StateIdWithContext<out Context>>
+        previousActiveStateIds: List<StateId>, nextActiveStateIds: List<StateId>
     ) -> Unit
-) : TransitionListener
+) : TransitionListener<C>
 
-class MachineTransitionWithContextListener(
+class MachineTransitionWithContextListener<C : Any>(
     val callback: (
-        prev: List<StateIdWithContextPair<*>>, next: List<StateIdWithContextPair<*>>
+        prev: List<StateIdWithContextPair<C>>, next: List<StateIdWithContextPair<C>>
     ) -> Unit
-) : TransitionListener
+) : TransitionListener<C>

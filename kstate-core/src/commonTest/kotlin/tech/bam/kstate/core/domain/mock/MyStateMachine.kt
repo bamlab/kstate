@@ -1,10 +1,9 @@
 package tech.bam.kstate.core.domain.mock
 
-import tech.bam.kstate.core.Context
-import tech.bam.kstate.core.StateIdWithContext
+import tech.bam.kstate.core.StateId
 
-object MyStateIdWithContext : StateIdWithContext<MyContext>
+object MyStateId : StateId
 
-interface MyContext : Context {
+interface MyContext {
     val myBoolean: Boolean
 }
