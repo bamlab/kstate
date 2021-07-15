@@ -7,6 +7,9 @@ import io.mockk.verify
 import tech.bam.kstate.core.domain.mock.ChooseAmount
 import tech.bam.kstate.core.domain.mock.CreditCardInsideTheATMContext
 import tech.bam.kstate.core.domain.mock.InsertCreditCard
+import tech.bam.kstate.core.domain.mock.TrafficLightEvent.TIMER
+import tech.bam.kstate.core.domain.mock.TrafficLightStateId.GREEN
+import tech.bam.kstate.core.domain.mock.TrafficLightStateId.RED
 import tech.bam.kstate.core.domain.mock.Welcome
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -78,5 +81,42 @@ class ContextualStateMachineFunctionalTest {
             )
         }
         confirmVerified(effect)
+    }
+
+    @Test
+    fun `it uses context factory`() {
+        val listener =
+            mockk<(p: List<StateIdWithContextPair<Int>>, n: List<StateIdWithContextPair<Int>>) -> Unit>()
+        every { listener(any(), any()) } returns Unit
+        val machine = createContextMachine<Int> {
+            initial(RED)
+            state(RED) {
+                context(10)
+                transition(on = TIMER, target = GREEN)
+            }
+            state(GREEN) {
+                transition(on = TIMER, target = RED)
+            }
+        }
+
+        machine.onTransitionWithContext(listener)
+
+        machine.send(TIMER)
+        verify {
+            listener(
+                listOf(StateIdWithContextPair(RED, 10)),
+                listOf(StateIdWithContextPair(GREEN, null))
+            )
+        }
+
+        machine.send(TIMER)
+        verify {
+            listener(
+                listOf(StateIdWithContextPair(GREEN, null)),
+                listOf(StateIdWithContextPair(RED, 10))
+            )
+        }
+
+        confirmVerified(listener)
     }
 }

@@ -14,3 +14,12 @@ fun createNavigationMachine(
         strategy = StrategyType.Internal,
         init = init
     )
+
+//fun <F : Fragment> StateBuilder<FragmentFactory>.screen(
+//    id: Screen<F>,
+//    type: Type = Type.Hierarchical,
+//    strategy: StrategyType = this.strategy,
+//    init: StateBuilder<FragmentFactory>.() -> Unit = {}
+//) {
+//    this.state()
+//}

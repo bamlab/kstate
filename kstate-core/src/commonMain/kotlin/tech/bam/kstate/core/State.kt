@@ -1,5 +1,6 @@
 package tech.bam.kstate.core
 
+import tech.bam.kstate.core.domain.constants.History
 import tech.bam.kstate.core.domain.constants.RootStateId
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
 import tech.bam.kstate.core.domain.exception.NoRegisteredStates
@@ -10,6 +11,9 @@ open class State<C : Any>(
     val type: Type,
     private val strategy: StrategyType
 ) {
+    var history: StateId? = null
+    var historyContext: C? = null
+
     // Protected API
     var transitions: Set<Transition<C, out Event>> = setOf()
         protected set
@@ -68,19 +72,33 @@ open class State<C : Any>(
         val transition = currentState.findTransitionOn(event)
         if (transition != null) {
             if (transition.target != null) {
-                val newState = states.find { it.id == transition.target }
-                if (newState != null) {
-                    currentState.restart()
-                    newState.start(transition.effect(event))
-                    currentStateId = newState.id
-                    return true
+                if (transition.target == History) {
+                    if (history != null) {
+                        currentState.stop()
+                        currentStateId = history
+                        currentState()?.start(historyContext)
+                        history = null
+                        historyContext = null
+                        return true
+                    }
+                } else {
+                    val newState = states.find { it.id == transition.target }
+                    if (newState != null) {
+                        history = currentStateId
+                        historyContext = currentState.context
+                        currentState.stop()
+                        newState.start(transition.effect(event))
+                        currentStateId = newState.id
+                        return true
+                    }
                 }
             }
         }
         return false
     }
 
-    private fun restart() {
+    private fun stop() {
+        context = null
         if (isCompound()) {
             currentStateId = initial
         }
@@ -192,7 +210,7 @@ open class State<C : Any>(
 class StateBuilder<C : Any>(
     id: StateId,
     type: Type,
-    private val strategy: StrategyType
+    val strategy: StrategyType
 ) : State<C>(id, type, strategy) {
     /**
      * Sets the initial state.
@@ -214,9 +232,9 @@ class StateBuilder<C : Any>(
     fun transition(
         on: Event? = null,
         target: StateId? = null,
-        effect: (() -> Unit) = {}
+        effect: (() -> C?) = { null }
     ) {
-        val newTransition = createTransition<C>(on, target, effect)
+        val newTransition = createTransition(on, target, effect)
         transitions = transitions.toMutableSet().also { it.add(newTransition) }
     }
 

@@ -37,7 +37,7 @@ class TransitionUnitTest {
         val effect = mockk<() -> Unit>()
         every { effect() } returns Unit
 
-        val transition = createTransition<Nothing>(target = FooState) {
+        val transition = createTransition(target = FooState) {
             effect()
         }
 
@@ -51,7 +51,7 @@ class TransitionUnitTest {
         val effect = mockk<() -> Unit>()
         every { effect() } returns Unit
 
-        val transition = createTransition<Nothing>(target = ContextualBarState) {
+        val transition = createTransition(target = ContextualBarState) {
             effect()
             object : BarContext {}
         }

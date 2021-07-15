@@ -34,11 +34,8 @@ internal class TransitionBuilder<C : Any, E : Event> : Transition<C, E>() {
         return this
     }
 
-    fun setEffect(effect: (() -> Unit)): TransitionBuilder<C, E> {
-        this.effect = { _ ->
-            effect()
-            null
-        }
+    fun setEffect(effect: (() -> C?)): TransitionBuilder<C, E> {
+        this.effect = { _ -> effect() }
         return this
     }
 
@@ -56,7 +53,7 @@ internal class TransitionBuilder<C : Any, E : Event> : Transition<C, E>() {
 internal fun <C : Any> createTransition(
     on: Event? = null,
     target: StateId? = null,
-    effect: (() -> Unit) = {}
+    effect: (() -> C?) = { null }
 ): Transition<C, Event> {
     val transition = TransitionBuilder<C, Event>()
     transition

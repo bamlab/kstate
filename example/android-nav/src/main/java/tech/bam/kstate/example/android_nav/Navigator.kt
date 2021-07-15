@@ -24,6 +24,7 @@ class Navigator(private val mainActivity: MainActivity) {
     private val machine = createNavigationMachine(type = Type.Parallel) {
         state(Base) {
             initial(Welcome)
+            a()
             state(Welcome) {
                 context { WelcomeFragment() }
                 transition(
