@@ -96,4 +96,21 @@ internal class StateUnitTest {
 
         assertEquals(context, state.context)
     }
+
+/*    @Test
+    fun `it registers on entry callbacks`() {
+        val rootOnEntry = mockk<() -> Unit>()
+        val deepOnEntry = mockk<() -> Unit>()
+        val state = createState(StubStateId) {
+            initial(FooStateId)
+
+            onEntry { rootOnEntry() }
+            state(FooStateId) {
+                onEntry { deepOnEntry() }
+            }
+            state(BarStateId)
+        }.start()
+
+        assertEquals(listOf(FooStateId, BarStateId), state.stateIds)
+    }*/
 }

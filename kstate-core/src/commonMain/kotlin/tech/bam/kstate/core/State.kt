@@ -27,7 +27,8 @@ open class State<C : Any>(
 
     // Private API
     // TODO: Implement the following
-    private val onEntry: () -> Unit = {}
+    var onEntry: (() -> Unit)? = null
+        protected set
     private val onExit: () -> Unit = {}
     var listeners: List<TransitionListener<C>> = listOf()
         private set
@@ -108,6 +109,7 @@ open class State<C : Any>(
         if (context != null) {
             this.context = context
         }
+        onEntry?.let { it() }
         when (type) {
             Type.Hierarchical -> currentState()?.start()
             Type.Parallel -> states.forEach { it.start() }
@@ -288,6 +290,15 @@ class StateBuilder<C : Any>(
      */
     fun context(context: C) {
         this.context = context
+    }
+
+    /**
+     * Declares a callback that runs on state entry.
+     *
+     * @param callback
+     */
+    fun onEntry(callback: () -> Unit) {
+        onEntry = callback
     }
 
     /**
