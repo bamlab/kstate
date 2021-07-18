@@ -1,3 +1,4 @@
+/*
 package tech.bam.kstate.core
 
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
@@ -97,6 +98,7 @@ internal class DeprecatedStateUnitTest {
         assertEquals(context, state.context)
     }
 
+*/
 /*    @Test
     fun `it registers on entry callbacks`() {
         val rootOnEntry = mockk<() -> Unit>()
@@ -112,5 +114,6 @@ internal class DeprecatedStateUnitTest {
         }.start()
 
         assertEquals(listOf(FooStateId, BarStateId), state.stateIds)
-    }*/
-}
+    }*//*
+
+}*/

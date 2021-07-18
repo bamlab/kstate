@@ -1,3 +1,4 @@
+/*
 package tech.bam.kstate.core
 
 import tech.bam.kstate.core.domain.constants.History
@@ -7,15 +8,15 @@ import tech.bam.kstate.core.domain.exception.NoRegisteredStates
 import kotlin.reflect.KClass
 
 open class DeprecatedState<C : Any>(
-    val id: StateId,
-    val type: Type,
+    override val id: StateId,
+    override val type: Type,
     private val strategy: StrategyType
-) {
-    var history: StateId? = null
+) : State<C> {
+    override var history: StateId? = null
     var historyContext: C? = null
 
     // Protected API
-    var transitions: Set<Transition<C, out Event>> = setOf()
+    override var transitions: Set<Transition<C, out Event>> = setOf()
         protected set
     protected var states: List<DeprecatedState<C>> = listOf()
     var initial: StateId? = null
@@ -27,9 +28,9 @@ open class DeprecatedState<C : Any>(
 
     // Private API
     // TODO: Implement the following
-    var onEntry: (() -> Unit)? = null
+    override var onEntry: (() -> Unit)? = null
         protected set
-    private val onExit: () -> Unit = {}
+    override val onExit: () -> Unit = {}
     var listeners: List<TransitionListener<C>> = listOf()
         private set
 
@@ -44,8 +45,8 @@ open class DeprecatedState<C : Any>(
     val stateIds: List<StateId>
         get() = states.map { it.id }
 
-    fun isCompound() = states.isNotEmpty()
-    fun <E : Event> findTransitionOn(event: E): Transition<C, E>? {
+    override fun isCompound() = states.isNotEmpty()
+    override fun <E : Event> findTransitionOn(event: E): Transition<C, E>? {
         val transition = transitions.find { it.event == event || it.eventClass == event::class }
         return if (transition == null) null else
             @Suppress("UNCHECKED_CAST")
@@ -98,14 +99,14 @@ open class DeprecatedState<C : Any>(
         return false
     }
 
-    private fun stop() {
+    override fun stop() {
         context = null
         if (isCompound()) {
             currentStateId = initial
         }
     }
 
-    fun start(context: C? = null) {
+    override fun start(context: C?) {
         if (context != null) {
             this.context = context
         }
@@ -214,23 +215,27 @@ class DeprecatedStateBuilder<C : Any>(
     type: Type,
     val strategy: StrategyType
 ) : DeprecatedState<C>(id, type, strategy) {
-    /**
-     * Sets the initial state.
-     * This it not used when type is [Type.Parallel].
-     *
-     * @param id the initial state id.
-     */
+    */
+/**
+ * Sets the initial state.
+ * This it not used when type is [Type.Parallel].
+ *
+ * @param id the initial state id.
+ *//*
+
     fun initial(id: StateId) {
         initial = id
     }
 
-    /**
-     * Declare a transition.
-     *
-     * @param on the event the state should react to.
-     * @param target the target [StateId].
-     * @param effect a side effect called when transition is used.
-     */
+    */
+/**
+ * Declare a transition.
+ *
+ * @param on the event the state should react to.
+ * @param target the target [StateId].
+ * @param effect a side effect called when transition is used.
+ *//*
+
     fun transition(
         on: Event? = null,
         target: StateId? = null,
@@ -240,13 +245,15 @@ class DeprecatedStateBuilder<C : Any>(
         transitions = transitions.toMutableSet().also { it.add(newTransition) }
     }
 
-    /**
-     * Declare a transition.
-     *
-     * @param on the event the state should react to.
-     * @param target the target [StateId].
-     * @param effect a side effect called when transition is used. It should return a context for the given target.
-     */
+    */
+/**
+ * Declare a transition.
+ *
+ * @param on the event the state should react to.
+ * @param target the target [StateId].
+ * @param effect a side effect called when transition is used. It should return a context for the given target.
+ *//*
+
     fun <E : Event> transition(
         on: KClass<E>,
         target: StateId,
@@ -256,19 +263,21 @@ class DeprecatedStateBuilder<C : Any>(
         transitions = transitions.toMutableSet().also { it.add(newTransition) }
     }
 
-    /**
-     * Declare a child transition.
-     * Doing so, the current state becomes a compound state.
-     *
-     * @param id the [StateId] of the child.
-     * @param type the type of the state machine. Either [Type.Hierarchical] or [Type.Parallel].
-     * @param strategy the strategy of the state machine.
-     *  Either [StrategyType.External] or [StrategyType.Internal].
-     *  *kstate* introduces [StrategyType] concept. Default to [StrategyType.External].
-     *  When set to [StrategyType.Internal], events are handled by children first, and
-     *  then the compound state.
-     * @param init use *kstate*'s DSL to declare your state machine.
-     */
+    */
+/**
+ * Declare a child transition.
+ * Doing so, the current state becomes a compound state.
+ *
+ * @param id the [StateId] of the child.
+ * @param type the type of the state machine. Either [Type.Hierarchical] or [Type.Parallel].
+ * @param strategy the strategy of the state machine.
+ *  Either [StrategyType.External] or [StrategyType.Internal].
+ *  *kstate* introduces [StrategyType] concept. Default to [StrategyType.External].
+ *  When set to [StrategyType.Internal], events are handled by children first, and
+ *  then the compound state.
+ * @param init use *kstate*'s DSL to declare your state machine.
+ *//*
+
     fun state(
         id: StateId,
         type: Type = Type.Hierarchical,
@@ -283,27 +292,33 @@ class DeprecatedStateBuilder<C : Any>(
         states = states.toMutableList().also { it.add(newState) }
     }
 
-    /**
-     * Declares a context.
-     *
-     * @param context the context to be registered in the current state.
-     */
+    */
+/**
+ * Declares a context.
+ *
+ * @param context the context to be registered in the current state.
+ *//*
+
     fun context(context: C) {
         this.context = context
     }
 
-    /**
-     * Declares a callback that runs on state entry.
-     *
-     * @param callback
-     */
+    */
+/**
+ * Declares a callback that runs on state entry.
+ *
+ * @param callback
+ *//*
+
     fun onEntry(callback: () -> Unit) {
         onEntry = callback
     }
 
-    /**
-     * Check state machine declaration. You should *NOT* call this function yourself.
-     */
+    */
+/**
+ * Check state machine declaration. You should *NOT* call this function yourself.
+ *//*
+
     fun build(): DeprecatedState<C> {
         if (id is RootStateId && states.isEmpty()) throw NoRegisteredStates()
         if (initial == null && states.isNotEmpty())
@@ -326,3 +341,4 @@ internal fun <C : Any> createContextState(
     strategy: StrategyType = StrategyType.External,
     init: DeprecatedStateBuilder<C>.() -> Unit
 ) = DeprecatedStateBuilder<C>(id, type, strategy).apply(init).build()
+*/

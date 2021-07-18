@@ -1,3 +1,4 @@
+/*
 package tech.bam.kstate.core.domain.mock
 
 import tech.bam.kstate.core.Event
@@ -20,4 +21,4 @@ sealed class PedestrianLightStateId : StateId {
     object PEDESTRIAN_LIGHT : PedestrianLightStateId()
     object WALK : PedestrianLightStateId()
     object WAIT : PedestrianLightStateId()
-}
+}*/

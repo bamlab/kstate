@@ -1,3 +1,4 @@
+/*
 package tech.bam.kstate.core
 
 import io.mockk.confirmVerified
@@ -138,4 +139,4 @@ class MachineUnitTest {
 
         assertEquals(context, state.context)
     }
-}
+}*/

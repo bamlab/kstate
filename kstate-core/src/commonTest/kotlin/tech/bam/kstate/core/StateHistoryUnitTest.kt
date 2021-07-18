@@ -1,3 +1,4 @@
+/*
 package tech.bam.kstate.core
 
 import io.mockk.confirmVerified
@@ -107,4 +108,4 @@ class StateHistoryUnitTest {
 
         confirmVerified(listener)
     }
-}
+}*/

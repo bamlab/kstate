@@ -7,21 +7,32 @@ sealed class TransitionType {
     object Internal : TransitionType()
 }
 
-open class Transition<C : Any, E : Event> {
+/**
+ * A transition.
+ *
+ * @param TT the target state type.
+ * @param TC the target state context.
+ * @param C the current context.
+ * @param E the event.
+ */
+open class Transition<TT, TC, C, E : Any> {
     // Protected API
     var event: Event? = null
         protected set
     var eventClass: KClass<E>? = null
         protected set
-    var target: StateId? = null
+    var target: StateId<TT, TC>? = null
         protected set
-    lateinit var effect: (event: E) -> C?
+    lateinit var effect: (event: E) -> TC?
         protected set
 
-    // TODO : Implement those
-    private val condition: Boolean = true
-    private val type: TransitionType = TransitionType.External
+    // TODO
+    private fun cond(context: C): Boolean = true
+
+    // TODO
+    private val type: TransitionType = TransitionType.Internal
 }
+/*
 
 internal class TransitionBuilder<C : Any, E : Event> : Transition<C, E>() {
     fun setEvent(event: Event?): TransitionBuilder<C, E> {
@@ -78,4 +89,4 @@ internal fun <C : Any, E : Event> createTransition(
         .setEventEffect(effect)
 
     return transition
-}
+}*/

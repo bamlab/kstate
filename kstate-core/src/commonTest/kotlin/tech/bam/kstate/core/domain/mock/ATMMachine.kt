@@ -1,3 +1,4 @@
+/*
 package tech.bam.kstate.core.domain.mock
 
 import tech.bam.kstate.core.Event
@@ -11,3 +12,4 @@ class InsertCreditCard(val clientId: String) : Event
 
 object Welcome : StateId
 object ChooseAmount : StateId
+*/

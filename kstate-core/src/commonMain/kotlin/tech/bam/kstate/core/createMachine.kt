@@ -1,7 +1,9 @@
+/*
 package tech.bam.kstate.core
 
 import tech.bam.kstate.core.domain.constants.RootStateId
 
+*/
 /**
  * Creates a *finite state machine* with a context.
  *
@@ -13,7 +15,8 @@ import tech.bam.kstate.core.domain.constants.RootStateId
  *  then the compound state.
  * @param init use *kstate*'s DSL to declare your state machine.
  * @return returns a [DeprecatedState]
- */
+ *//*
+
 fun <C : Any> createContextMachine(
     id: StateId = RootStateId(),
     type: Type = Type.Hierarchical,
@@ -26,4 +29,4 @@ fun createMachine(
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
     init: DeprecatedStateBuilder<Nothing>.() -> Unit
-): DeprecatedState<Nothing> = createState(id, type, strategy, init).also { it.start() }
+): DeprecatedState<Nothing> = createState(id, type, strategy, init).also { it.start() }*/

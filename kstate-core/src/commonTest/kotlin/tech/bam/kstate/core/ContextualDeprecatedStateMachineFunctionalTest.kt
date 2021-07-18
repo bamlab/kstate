@@ -1,3 +1,4 @@
+/*
 package tech.bam.kstate.core
 
 import io.mockk.confirmVerified
@@ -80,7 +81,8 @@ class ContextualDeprecatedStateMachineFunctionalTest {
         confirmVerified(effect)
     }
 
-    /*@Test
+    */
+/*@Test
     fun `it uses context factory`() {
         val listener =
             mockk<(p: List<StateIdWithContextPair<Int>>, n: List<StateIdWithContextPair<Int>>) -> Unit>()
@@ -115,5 +117,6 @@ class ContextualDeprecatedStateMachineFunctionalTest {
         }
 
         confirmVerified(listener)
-    }*/
-}
+    }*//*
+
+}*/
