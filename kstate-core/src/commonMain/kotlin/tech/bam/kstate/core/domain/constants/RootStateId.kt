@@ -2,4 +2,4 @@ package tech.bam.kstate.core.domain.constants
 
 import tech.bam.kstate.core.StateId
 
-internal class RootStateId : StateId<Any, Unit>
+internal class RootStateId<T, C> : StateId<T, C>

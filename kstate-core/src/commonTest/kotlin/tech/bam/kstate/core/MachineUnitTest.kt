@@ -16,58 +16,6 @@ import kotlin.test.assertFailsWith
 
 class MachineUnitTest {
     @Test
-    fun `it registers states`() {
-        val machine = createMachine {
-            state(RED)
-            state(YELLOW)
-            state(GREEN)
-        }
-        assertEquals(
-            machine.stateIds,
-            listOf(RED, YELLOW, GREEN)
-        )
-    }
-
-    @Test
-    fun `it rejects already registered states`() {
-        assertFailsWith<AlreadyRegisteredStateId> {
-            createMachine {
-                state(RED)
-                state(YELLOW)
-                state(RED)
-            }
-        }
-    }
-
-    @Test
-    fun `it registers an initial state`() {
-        val machine = createMachine {
-            initial(RED)
-            state(RED)
-            state(YELLOW)
-            state(GREEN)
-        }
-
-        assertEquals(RED, machine.initial)
-    }
-
-    @Test
-    fun `it uses the first state as initial state when no initial state is declared`() {
-        val machine = createMachine {
-            state(GREEN)
-            state(RED)
-            state(YELLOW)
-        }
-
-        assertEquals(GREEN, machine.initial)
-    }
-
-    @Test
-    fun `it fails when no state is passed`() {
-        assertFailsWith<NoRegisteredStates> { createMachine {} }
-    }
-
-    @Test
     fun `it registers listeners`() {
         val machine = createMachine {
             initial(RED)
@@ -125,18 +73,5 @@ class MachineUnitTest {
 
         verify { effect(listOf(), listOf()) }
         confirmVerified(effect)
-    }
-
-    @Test
-    fun `it registers a context`() {
-        val context = object : MyContext {
-            override val myBoolean = true
-        }
-        val state = createContextMachine<MyContext>(MyStateId) {
-            context(context)
-            state(FooStateId)
-        }
-
-        assertEquals(context, state.context)
     }
 }*/

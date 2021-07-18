@@ -17,13 +17,13 @@ sealed class TransitionType {
  */
 open class Transition<TT, TC, C, E : Any> {
     // Protected API
-    var event: Event? = null
+    var event: E? = null
         protected set
     var eventClass: KClass<E>? = null
         protected set
     var target: StateId<TT, TC>? = null
         protected set
-    lateinit var effect: (event: E) -> TC?
+    var effect: ((event: E, context: C) -> TC)? = null
         protected set
 
     // TODO
@@ -32,61 +32,39 @@ open class Transition<TT, TC, C, E : Any> {
     // TODO
     private val type: TransitionType = TransitionType.Internal
 }
-/*
 
-internal class TransitionBuilder<C : Any, E : Event> : Transition<C, E>() {
-    fun setEvent(event: Event?): TransitionBuilder<C, E> {
+
+internal class TransitionBuilder<TT, TC, C, E : Any> : Transition<TT, TC, C, E>() {
+    fun setEvent(event: E?): TransitionBuilder<TT, TC, C, E> {
         this.event = event
         return this
     }
 
-    fun setTarget(target: StateId?): TransitionBuilder<C, E> {
+    fun setTarget(target: StateId<TT, TC>?): TransitionBuilder<TT, TC, C, E> {
         this.target = target
         return this
     }
 
-    fun setEffect(effect: (() -> C?)): TransitionBuilder<C, E> {
-        this.effect = { _ -> effect() }
-        return this
-    }
-
-    fun setEventEffect(effect: ((event: E) -> C)): TransitionBuilder<C, E> {
+    fun setEffect(effect: ((event: E, context: C) -> TC)?): TransitionBuilder<TT, TC, C, E> {
         this.effect = effect
         return this
     }
 
-    fun setEventClass(on: KClass<E>): TransitionBuilder<C, E> {
+    fun setEventClass(on: KClass<E>): TransitionBuilder<TT, TC, C, E> {
         this.eventClass = on
         return this
     }
 }
 
-internal fun <C : Any> createTransition(
-    on: Event? = null,
-    target: StateId? = null,
-    effect: (() -> C?) = { null }
-): Transition<C, Event> {
-    val transition = TransitionBuilder<C, Event>()
+internal fun <TT, TC, C, E : Any> createTransition(
+    on: E,
+    target: StateId<TT, TC>,
+    effect: ((event: E, context: C) -> TC)?
+): Transition<TT, TC, C, E> {
+    val transition = TransitionBuilder<TT, TC, C, E>()
     transition
         .setEvent(on)
         .setTarget(target)
-        .setEffect {
-            effect()
-        }
-
+        .setEffect(effect)
     return transition
 }
-
-internal fun <C : Any, E : Event> createTransition(
-    on: KClass<E>,
-    target: StateId,
-    effect: ((event: E) -> C)
-): Transition<C, E> {
-    val transition = TransitionBuilder<C, E>()
-    transition
-        .setEventClass(on)
-        .setTarget(target)
-        .setEventEffect(effect)
-
-    return transition
-}*/
