@@ -6,7 +6,7 @@ import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
 import tech.bam.kstate.core.domain.exception.NoRegisteredStates
 import kotlin.reflect.KClass
 
-open class State<C : Any>(
+open class DeprecatedState<C : Any>(
     val id: StateId,
     val type: Type,
     private val strategy: StrategyType
@@ -17,7 +17,7 @@ open class State<C : Any>(
     // Protected API
     var transitions: Set<Transition<C, out Event>> = setOf()
         protected set
-    protected var states: List<State<C>> = listOf()
+    protected var states: List<DeprecatedState<C>> = listOf()
     var initial: StateId? = null
         protected set
     var currentStateId: StateId? = null
@@ -33,10 +33,10 @@ open class State<C : Any>(
     var listeners: List<TransitionListener<C>> = listOf()
         private set
 
-    private fun currentState(): State<C>? =
+    private fun currentState(): DeprecatedState<C>? =
         states.find { it.id == currentStateId }
 
-    private fun findStateWithId(stateId: StateId): State<C>? =
+    private fun findStateWithId(stateId: StateId): DeprecatedState<C>? =
         states.find { it.id == stateId }
 
 
@@ -209,11 +209,11 @@ open class State<C : Any>(
     }
 }
 
-class StateBuilder<C : Any>(
+class DeprecatedStateBuilder<C : Any>(
     id: StateId,
     type: Type,
     val strategy: StrategyType
-) : State<C>(id, type, strategy) {
+) : DeprecatedState<C>(id, type, strategy) {
     /**
      * Sets the initial state.
      * This it not used when type is [Type.Parallel].
@@ -273,7 +273,7 @@ class StateBuilder<C : Any>(
         id: StateId,
         type: Type = Type.Hierarchical,
         strategy: StrategyType = this.strategy,
-        init: StateBuilder<C>.() -> Unit = {}
+        init: DeprecatedStateBuilder<C>.() -> Unit = {}
     ) {
         if (states.find { it.id == id } != null) {
             throw AlreadyRegisteredStateId(id)
@@ -304,7 +304,7 @@ class StateBuilder<C : Any>(
     /**
      * Check state machine declaration. You should *NOT* call this function yourself.
      */
-    fun build(): State<C> {
+    fun build(): DeprecatedState<C> {
         if (id is RootStateId && states.isEmpty()) throw NoRegisteredStates()
         if (initial == null && states.isNotEmpty())
             initial = states[0].id
@@ -317,12 +317,12 @@ internal fun createState(
     id: StateId,
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
-    init: StateBuilder<Nothing>.() -> Unit
+    init: DeprecatedStateBuilder<Nothing>.() -> Unit
 ) = createContextState(id, type, strategy, init)
 
 internal fun <C : Any> createContextState(
     id: StateId,
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
-    init: StateBuilder<C>.() -> Unit
-) = StateBuilder<C>(id, type, strategy).apply(init).build()
+    init: DeprecatedStateBuilder<C>.() -> Unit
+) = DeprecatedStateBuilder<C>(id, type, strategy).apply(init).build()

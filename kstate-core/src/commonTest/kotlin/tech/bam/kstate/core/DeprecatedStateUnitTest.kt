@@ -12,7 +12,7 @@ object FooStateId : StateId
 object BarStateId : StateId
 object BazEvent : Event
 
-internal class StateUnitTest {
+internal class DeprecatedStateUnitTest {
     @Test
     fun `it registers states`() {
         val state = createState(StubStateId) {

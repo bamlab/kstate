@@ -7,14 +7,11 @@ import io.mockk.verify
 import tech.bam.kstate.core.domain.mock.ChooseAmount
 import tech.bam.kstate.core.domain.mock.CreditCardInsideTheATMContext
 import tech.bam.kstate.core.domain.mock.InsertCreditCard
-import tech.bam.kstate.core.domain.mock.TrafficLightEvent.TIMER
-import tech.bam.kstate.core.domain.mock.TrafficLightStateId.GREEN
-import tech.bam.kstate.core.domain.mock.TrafficLightStateId.RED
 import tech.bam.kstate.core.domain.mock.Welcome
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ContextualStateMachineFunctionalTest {
+class ContextualDeprecatedStateMachineFunctionalTest {
     @Test
     fun `it should transition and setup a context`() {
         val insertToCreditCardInsideTheATMContextFactory =
@@ -83,7 +80,7 @@ class ContextualStateMachineFunctionalTest {
         confirmVerified(effect)
     }
 
-    @Test
+    /*@Test
     fun `it uses context factory`() {
         val listener =
             mockk<(p: List<StateIdWithContextPair<Int>>, n: List<StateIdWithContextPair<Int>>) -> Unit>()
@@ -118,5 +115,5 @@ class ContextualStateMachineFunctionalTest {
         }
 
         confirmVerified(listener)
-    }
+    }*/
 }

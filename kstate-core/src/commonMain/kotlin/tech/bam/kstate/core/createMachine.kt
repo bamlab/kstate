@@ -12,18 +12,18 @@ import tech.bam.kstate.core.domain.constants.RootStateId
  *  When set to [StrategyType.Internal], events are handled by children first, and
  *  then the compound state.
  * @param init use *kstate*'s DSL to declare your state machine.
- * @return returns a [State]
+ * @return returns a [DeprecatedState]
  */
 fun <C : Any> createContextMachine(
     id: StateId = RootStateId(),
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
-    init: StateBuilder<C>.() -> Unit
-): State<C> = createContextState(id, type, strategy, init).also { it.start() }
+    init: DeprecatedStateBuilder<C>.() -> Unit
+): DeprecatedState<C> = createContextState(id, type, strategy, init).also { it.start() }
 
 fun createMachine(
     id: StateId = RootStateId(),
     type: Type = Type.Hierarchical,
     strategy: StrategyType = StrategyType.External,
-    init: StateBuilder<Nothing>.() -> Unit
-): State<Nothing> = createState(id, type, strategy, init).also { it.start() }
+    init: DeprecatedStateBuilder<Nothing>.() -> Unit
+): DeprecatedState<Nothing> = createState(id, type, strategy, init).also { it.start() }
