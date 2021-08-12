@@ -1,5 +1,5 @@
 package tech.bam.kstate.core.domain.constants
 
-import tech.bam.kstate.core.StateId
+import tech.bam.kstate.core.domain.types.StateId
 
-internal class RootStateId<T, C> : StateId<T, C>
+internal class RootStateId<Context> : StateId<Context>

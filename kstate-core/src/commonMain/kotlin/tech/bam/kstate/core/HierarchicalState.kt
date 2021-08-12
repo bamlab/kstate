@@ -1,31 +1,108 @@
 package tech.bam.kstate.core
 
-import tech.bam.kstate.core.domain.constants.RootStateId
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
+import tech.bam.kstate.core.domain.exception.StateNotFound
+import tech.bam.kstate.core.domain.types.StateId
 
-open class HierarchicalState<T, C, PC>(id: StateId<T, C>, val initialStateId: StateId<T, *>) :
-    State<T, C, PC>(id),
-    CompoundState<T, C, PC> {
-    override var states: List<State<T, *, C>> = listOf()
+open class HierarchicalState<C, PC>(id: StateId<C>, val initialStateId: StateId<*>, context: C) :
+    State<C, PC>(id, context),
+    CompoundState<C, PC> {
+    override var states: List<State<*, C>> = listOf()
+    var currentStateId: StateId<*>? = null
+
+    fun currentState(): State<*, C> {
+        val currentState = states.find { it.id == currentStateId }
+        if (currentState == null) throw StateNotFound(this.currentStateId!!, id)
+        else return currentState
+    }
+
+    override fun start() {
+        super.start()
+        this.currentStateId = initialStateId
+        val currentState = this.currentState()
+        currentState.start()
+    }
+
+    override fun stop() {
+        super.stop()
+        this.currentStateId = null
+    }
+
+    /**
+     * The id of the previous state.
+     * Can be `null` if this state is the initial state
+     * or if this state is a first destination of its parent.
+     */
+    var history: StateId<*>? = null
+
+    override fun send(event: Any): Boolean {
+        val handled = handleEventWithTransition(event) || handleEventWithChild(event)
+        if (handled) runAlwaysTransitions()
+        return handled
+    }
+
+    private fun runAlwaysTransitions() {
+        currentState().transitions
+            .filter { it.isAlways }
+            .forEach {
+                if (it.cond == null || it.cond.invoke(context)) {
+                    val matchingState = stateIds.find { stateId -> stateId == it.target }
+                    if (matchingState != null) {
+                        this.currentStateId = it.target
+                    }
+                }
+            }
+    }
+
+    private fun handleEventWithTransition(event: Any): Boolean {
+        val matchingTransition = currentState().findTransitionOn(event, context)
+        if (matchingTransition != null) {
+            val matchingState = stateIds.find { it == matchingTransition.target }
+            if (matchingState != null) {
+                this.currentStateId = matchingTransition.target
+                matchingTransition.effect?.invoke(event, context)
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun handleEventWithChild(event: Any): Boolean {
+        if (currentState() is CompoundState<*, *>) {
+            // TODO: Secure this unchecked cast.
+            @Suppress("UNCHECKED_CAST")
+            return (currentState() as CompoundState<*, C>).send(event)
+        }
+        return false
+    }
 }
 
-class HierarchicalStateBuilder<T, C, PC>(id: StateId<T, C>, initialStateId: StateId<T, *>) :
-    HierarchicalState<T, C, PC>(id, initialStateId) {
+class HierarchicalStateBuilder<C, PC>(id: StateId<C>, initialStateId: StateId<*>, context: C) :
+    HierarchicalState<C, PC>(id, initialStateId, context), CompoundStateBuilder<C, PC> {
 
-    fun state(
-        id: StateId<T, *>,
-        init: StateBuilder<T, *, C>.() -> Unit = {}
+    fun <Context> state(
+        id: StateId<Context>,
+        context: Context,
+        init: StateBuilder<Context, C>.() -> Unit = {}
     ) {
         if (states.find { it.id == id } != null) {
             throw AlreadyRegisteredStateId(id)
         }
 
-        val newState = createState(id, init)
+        val newState = StateBuilder<Context, C>(id, context).apply(init).build()
         states = states.toMutableList().also { it.add(newState) }
     }
 
-    fun context(context: C) {
-        this.context = context
+    fun state(
+        id: StateId<Any>,
+        init: StateBuilder<Any, C>.() -> Unit = {}
+    ) {
+        if (states.find { it.id == id } != null) {
+            throw AlreadyRegisteredStateId(id)
+        }
+
+        val newState = StateBuilder<Any, C>(id, Unit).apply(init).build()
+        states = states.toMutableList().also { it.add(newState) }
     }
 
     fun onEntry(onEntry: () -> Unit) {
@@ -36,24 +113,5 @@ class HierarchicalStateBuilder<T, C, PC>(id: StateId<T, C>, initialStateId: Stat
         this.onExit = onExit
     }
 
-    fun build(): HierarchicalState<T, C, PC> = this
+    fun build(): HierarchicalState<C, PC> = this
 }
-
-fun createHState(
-    initial: StateId<Any, *>,
-    init: HierarchicalStateBuilder<Any, Any, Any>.() -> Unit
-) =
-    HierarchicalStateBuilder<Any, Any, Any>(
-        id = RootStateId(),
-        initialStateId = initial
-    ).apply(init).also { it.context(Unit) }.build()
-
-
-fun <C> createHStateWithContext(
-    initial: StateId<Any, *>,
-    init: HierarchicalStateBuilder<Any, C, Any>.() -> Unit
-) =
-    HierarchicalStateBuilder<Any, C, Any>(
-        id = RootStateId(),
-        initialStateId = initial
-    ).apply(init).build()

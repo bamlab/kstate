@@ -1,39 +1,29 @@
 package tech.bam.kstate.core
 
-import tech.bam.kstate.core.domain.exception.UninitializedContext
+import tech.bam.kstate.core.domain.types.StateId
+import kotlin.reflect.KClass
 
 /**
  * A State.
  *
- * @param T the concrete representation of this state.
  * @param C the context of this state.
  * @param PC the parent state's context.
  */
-open class State<T, C, PC>(
+open class State<C, PC>(
     /**
      * The id of this state.
      * The state id is only an immutable identifier.
-     * This state represents [T], which is the concrete
-     * and contextual representation of this state.
      */
-    val id: StateId<T, C>
-) {
+    val id: StateId<C>,
     /**
      * The context of the state.
      */
-    var context: C? = null
-
-    /**
-     * The id of the previous state.
-     * Can be [null] if this state is the initial state
-     * or if this state is a first destination of its parent.
-     */
-    var history: StateId<T, *>? = null
-
+    var context: C
+) {
     /**
      * The set of transitions allowed by this state.
      */
-    var transitions: Set<Transition<T, *, PC, *>> = setOf()
+    var transitions: Set<Transition<*, PC, *>> = setOf()
 
     /**
      * The callback fired when this state is active.
@@ -51,40 +41,93 @@ open class State<T, C, PC>(
      * @param event the event sent to the state.
      * @return a transition or [null] if nothing is found.
      */
-    fun findTransitionOn(event: Any): Transition<T, *, PC, *>? {
-        return transitions.find { it.event == event || it.eventClass == event::class }
+    fun <E : Any> findTransitionOn(event: E, context: PC): Transition<*, PC, E>? {
+        // TODO: Secure this unchecked cast.
+        @Suppress("UNCHECKED_CAST")
+        return transitions.find {
+            (it.event == event || it.eventClass?.isInstance(event) == true)
+                    && (it.cond == null || it.cond.invoke(context))
+
+        } as Transition<*, PC, E>?
     }
 
     /**
      * This state stop logic.
      */
-    fun stop() {
+    open fun stop() {
         onExit?.let { it() }
     }
 
     /**
      * This state start logic.
      */
-    fun start() {
-        if (context == null) {
-            throw UninitializedContext(id)
-        }
+    open fun start() {
         onEntry?.let { it() }
+    }
+
+    /**
+     * Lists all active state ids.
+     *
+     * @return a list of state ids.
+     */
+    fun activeStateIds(): List<StateId<*>> {
+        return listOf(id)
+    }
+
+    fun assign(context: C) {
+        this.context = context
     }
 }
 
-class StateBuilder<T, C, PC>(id: StateId<T, C>) : State<T, C, PC>(id) {
-    fun <E : Any, TC> transition(
+class StateBuilder<C, PC>(id: StateId<C>, context: C) : State<C, PC>(id, context) {
+    fun <E : Any, TargetContext> transition(
         on: E,
-        target: StateId<T, TC>,
-        effect: ((event: E, context: PC) -> TC)? = null
+        target: StateId<TargetContext>,
+        effect: ((context: PC) -> TargetContext)? = null
     ) {
-        val newTransition = createTransition(on, target, effect)
+        val newTransition = if (effect == null) Transition<TargetContext, PC, E>(
+            event = on,
+            target = target,
+        ) else Transition(
+            event = on,
+            target = target,
+            effect = { _, context -> effect(context) }
+        )
         transitions = transitions.toMutableSet().also { it.add(newTransition) }
     }
 
-    fun build(): State<T, C, PC> = this
-}
+    fun <E : Any, TargetContext> transition(
+        on: KClass<E>,
+        target: StateId<TargetContext>,
+        effect: ((event: E, context: PC) -> TargetContext)? = null
+    ) {
+        val newTransition = Transition(
+            eventClass = on,
+            target = target,
+            effect = effect
+        )
+        transitions = transitions.toMutableSet().also { it.add(newTransition) }
+    }
 
-fun <T, C, PC> createState(id: StateId<T, C>, init: StateBuilder<T, C, PC>.() -> Unit) =
-    StateBuilder<T, C, PC>(id).apply(init).build()
+    fun always(
+        target: StateId<Any>,
+        cond: ((context: PC) -> Boolean)
+    ) {
+        val newTransition = Transition<Any, PC, Any>(
+            target = target,
+            cond = cond,
+            isAlways = true
+        )
+        transitions = transitions.toMutableSet().also { it.add(newTransition) }
+    }
+
+    fun onEntry(onEntry: () -> Unit) {
+        this.onEntry = onEntry
+    }
+
+    fun onExit(onExit: () -> Unit) {
+        this.onExit = onExit
+    }
+
+    fun build(): State<C, PC> = this
+}

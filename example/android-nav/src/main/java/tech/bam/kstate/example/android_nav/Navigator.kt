@@ -5,8 +5,8 @@ import androidx.fragment.app.Fragment
 import tech.bam.kstate.android.navigation.FragmentFactory
 import tech.bam.kstate.android.navigation.createNavigationMachine
 import tech.bam.kstate.core.Event
-import tech.bam.kstate.core.StateId
 import tech.bam.kstate.core.Type
+import tech.bam.kstate.core.domain.types.StateId
 
 object Welcome : StateId
 object LoggedIn : StateId

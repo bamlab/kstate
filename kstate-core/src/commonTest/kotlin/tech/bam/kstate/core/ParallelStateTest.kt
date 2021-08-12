@@ -6,91 +6,61 @@ import io.mockk.mockk
 import io.mockk.verify
 import tech.bam.kstate.core.domain.constants.RootStateId
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
-import tech.bam.kstate.core.domain.exception.StateNotFound
 import tech.bam.kstate.core.domain.mock.CoffeeMachineContext
 import tech.bam.kstate.core.domain.mock.CoffeeMachineStateId
-import tech.bam.kstate.core.domain.mock.TrafficLightStateId.GREEN
+import tech.bam.kstate.core.domain.mock.PedestrianLightStateId.PEDESTRIAN_LIGHT
 import tech.bam.kstate.core.domain.mock.TrafficLightStateId.RED
-import tech.bam.kstate.core.domain.types.StateId
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-fun createHState(
-    initial: StateId<*>,
-    init: HierarchicalStateBuilder<Any, Any>.() -> Unit
+fun createPState(
+    init: ParallelStateBuilder<Any, Any>.() -> Unit
 ) =
-    HierarchicalStateBuilder<Any, Any>(
+    ParallelStateBuilder<Any, Any>(
         id = RootStateId(),
-        initialStateId = initial,
         context = Unit
     ).apply(init).build()
 
-fun <C> createHStateWithContext(
-    initial: StateId<*>,
+fun <C> createPStateWithContext(
     context: C,
-    init: HierarchicalStateBuilder<C, Any>.() -> Unit
+    init: ParallelStateBuilder<C, Any>.() -> Unit
 ) =
-    HierarchicalStateBuilder<C, Any>(
+    ParallelStateBuilder<C, Any>(
         id = RootStateId(),
-        initialStateId = initial,
         context = context
     ).apply(init).build()
 
-class HierarchicalStateTest {
+class ParallelStateTest {
     @Test
     fun `it registers states`() {
-        val stateMachine = createHState(initial = RED) {
+        val stateMachine = createPState {
             state(RED)
-            state(GREEN)
+            state(PEDESTRIAN_LIGHT)
         }
 
         stateMachine.start()
 
-        assertEquals(listOf(RED, GREEN), stateMachine.stateIds)
-    }
-
-    @Test
-    fun `it registers the initial state`() {
-        val stateMachine = createHState(initial = RED) {
-            state(RED)
-            state(GREEN)
-        }
-
-        stateMachine.start()
-
-        assertEquals((RED), stateMachine.initialStateId)
+        assertEquals(listOf(RED, PEDESTRIAN_LIGHT), stateMachine.stateIds)
     }
 
     @Test
     fun `it rejects already registered states`() {
         assertFailsWith<AlreadyRegisteredStateId> {
-            createHState(initial = RED) {
+            createPState {
                 state(RED)
                 state(RED)
             }
         }
     }
-
-    @Test
-    fun `it fails when initial state is not declared`() {
-        assertFailsWith<StateNotFound> {
-            val stateMachine = createHState(initial = RED) {
-            }
-
-            stateMachine.start()
-        }
-    }
-
 
     @Test
     fun `it registers on entry callback`() {
         val onEntryCb = mockk<() -> Unit>()
         every { onEntryCb() } returns Unit
 
-        val stateMachine = createHState(initial = RED) {
+        val stateMachine = createPState {
             onEntry(onEntryCb)
-            state(RED)
         }
 
         stateMachine.start()
@@ -104,9 +74,8 @@ class HierarchicalStateTest {
         val onExitCb = mockk<() -> Unit>()
         every { onExitCb() } returns Unit
 
-        val stateMachine = createHState(initial = RED) {
+        val stateMachine = createPState {
             onExit(onExitCb)
-            state(RED)
         }
 
         stateMachine.start()
@@ -118,8 +87,7 @@ class HierarchicalStateTest {
 
     @Test
     fun `it registers a context`() {
-        val stateMachine = createHStateWithContext(
-            initial = CoffeeMachineStateId.OFF,
+        val stateMachine = createPStateWithContext(
             context = CoffeeMachineContext(0, 10)
         ) {
             state(CoffeeMachineStateId.OFF)

@@ -1,22 +1,19 @@
 package tech.bam.kstate.core.domain.mock
 
-import tech.bam.kstate.core.UntypedStateId
+import tech.bam.kstate.core.domain.types.SimpleStateId
 
-sealed class TrafficLightStateId : UntypedStateId {
-    object TRAFFIC_LIGHT : TrafficLightStateId()
+sealed class TrafficLightStateId : SimpleStateId {
     object RED : TrafficLightStateId()
     object YELLOW : TrafficLightStateId()
     object GREEN : TrafficLightStateId()
 }
-
-data class TrafficLightContext(val position: String)
 
 sealed class TrafficLightEvent {
     object TIMER : TrafficLightEvent()
     object SHORT_TIMER : TrafficLightEvent()
 }
 
-sealed class PedestrianLightStateId : UntypedStateId {
+sealed class PedestrianLightStateId : SimpleStateId {
     object PEDESTRIAN_LIGHT : PedestrianLightStateId()
     object WALK : PedestrianLightStateId()
     object WAIT : PedestrianLightStateId()
