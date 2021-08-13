@@ -11,4 +11,14 @@ fun <Context> createMachine(
     id = id,
     context = context,
     initialStateId = initial
-).apply(init)
+).apply(init).build()
+
+fun createMachine(
+    id: StateId<Any>,
+    initial: StateId<*>,
+    init: HierarchicalStateBuilder<Any, Unit>.() -> Unit
+) = HierarchicalStateBuilder<Any, Unit>(
+    id = id,
+    context = Unit,
+    initialStateId = initial
+).apply(init).build()

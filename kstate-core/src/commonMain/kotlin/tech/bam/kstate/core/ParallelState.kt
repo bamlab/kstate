@@ -1,6 +1,5 @@
 package tech.bam.kstate.core
 
-import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
 import tech.bam.kstate.core.domain.types.StateId
 
 open class ParallelState<C, PC>(id: StateId<C>, context: C) :
@@ -17,7 +16,7 @@ open class ParallelState<C, PC>(id: StateId<C>, context: C) :
         states.forEach { state -> state.stop() }
         super.stop()
     }
-    
+
     override fun send(event: Any): Boolean {
         return states.any {
             if (it is CompoundState<*, *>) {
@@ -31,40 +30,25 @@ open class ParallelState<C, PC>(id: StateId<C>, context: C) :
 }
 
 class ParallelStateBuilder<C, PC>(id: StateId<C>, context: C) :
-    ParallelState<C, PC>(id, context), CompoundStateBuilder<C, PC> {
+    ParallelState<C, PC>(id, context), CompoundStateBuilder<C, PC>,
+    IStateBuilder<C, PC> {
 
     fun <Context> state(
         id: StateId<Context>,
         context: Context,
         init: StateBuilder<Context, C>.() -> Unit = {}
     ) {
-        if (states.find { it.id == id } != null) {
-            throw AlreadyRegisteredStateId(id)
-        }
-
         val newState = StateBuilder<Context, C>(id, context).apply(init).build()
-        states = states.toMutableList().also { it.add(newState) }
+        addState(newState)
     }
 
     fun state(
         id: StateId<Any>,
         init: StateBuilder<Any, C>.() -> Unit = {}
     ) {
-        if (states.find { it.id == id } != null) {
-            throw AlreadyRegisteredStateId(id)
-        }
-
         val newState = StateBuilder<Any, C>(id, Unit).apply(init).build()
-        states = states.toMutableList().also { it.add(newState) }
+        addState(newState)
     }
-
-    fun onEntry(onEntry: () -> Unit) {
-        this.onEntry = onEntry
-    }
-
-    fun onExit(onExit: () -> Unit) {
-        this.onExit = onExit
-    }
-
+    
     fun build(): ParallelState<C, PC> = this
 }

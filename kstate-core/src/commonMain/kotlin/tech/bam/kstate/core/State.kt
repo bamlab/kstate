@@ -3,6 +3,12 @@ package tech.bam.kstate.core
 import tech.bam.kstate.core.domain.types.StateId
 import kotlin.reflect.KClass
 
+interface Transitionable<PC> {
+    var transitions: Set<Transition<*, PC, *>>
+    var onEntry: (() -> Unit)?
+    var onExit: (() -> Unit)?
+}
+
 /**
  * A State.
  *
@@ -19,21 +25,21 @@ open class State<C, PC>(
      * The context of the state.
      */
     var context: C
-) {
+) : Transitionable<PC> {
     /**
      * The set of transitions allowed by this state.
      */
-    var transitions: Set<Transition<*, PC, *>> = setOf()
+    override var transitions: Set<Transition<*, PC, *>> = setOf()
 
     /**
      * The callback fired when this state is active.
      */
-    var onEntry: (() -> Unit)? = null
+    override var onEntry: (() -> Unit)? = null
 
     /**
      * The callback fired when this state becomes inactive.
      */
-    var onExit: (() -> Unit)? = null
+    override var onExit: (() -> Unit)? = null
 
     /**
      * Call this function to find a matching transition for the given event.
@@ -70,7 +76,7 @@ open class State<C, PC>(
      *
      * @return a list of state ids.
      */
-    fun activeStateIds(): List<StateId<*>> {
+    open fun activeStateIds(): List<StateId<*>> {
         return listOf(id)
     }
 
@@ -79,7 +85,7 @@ open class State<C, PC>(
     }
 }
 
-class StateBuilder<C, PC>(id: StateId<C>, context: C) : State<C, PC>(id, context) {
+interface IStateBuilder<C, PC> : Transitionable<PC> {
     fun <E : Any, TargetContext> transition(
         on: E,
         target: StateId<TargetContext>,
@@ -128,6 +134,9 @@ class StateBuilder<C, PC>(id: StateId<C>, context: C) : State<C, PC>(id, context
     fun onExit(onExit: () -> Unit) {
         this.onExit = onExit
     }
+}
 
+class StateBuilder<C, PC>(id: StateId<C>, context: C) : State<C, PC>(id, context),
+    IStateBuilder<C, PC> {
     fun build(): State<C, PC> = this
 }

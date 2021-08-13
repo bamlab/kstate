@@ -8,7 +8,7 @@ import tech.bam.kstate.core.domain.constants.RootStateId
 import tech.bam.kstate.core.domain.exception.AlreadyRegisteredStateId
 import tech.bam.kstate.core.domain.mock.CoffeeMachineContext
 import tech.bam.kstate.core.domain.mock.CoffeeMachineStateId
-import tech.bam.kstate.core.domain.mock.PedestrianLightStateId.PEDESTRIAN_LIGHT
+import tech.bam.kstate.core.domain.mock.PEDESTRIAN_LIGHT
 import tech.bam.kstate.core.domain.mock.TrafficLightStateId.RED
 import kotlin.test.Test
 import kotlin.test.assertEquals
