@@ -1,8 +1,14 @@
 site_name: kstate docs
 nav:
   - index.md
-  - quickstart.md
-  - guides/index.md
+  - Guides:
+      - guides/getting-started.md
+      - guides/states.md
+      - guides/events.md
+      - guides/transitions.md
+      - guides/hierarchical-state.md
+      - guides/parallel-state.md
+      - guides/context.md
   - api.md
   - about.md
 theme:

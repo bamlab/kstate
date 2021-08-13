@@ -2,31 +2,30 @@
 
 ### State ids and event declaration
 
-Extend the `StateId` and the `Event` types.
+Extend the `SimpleStateId` type.
 
 ```kotlin
-sealed class TrafficLightStateId : StateId {
+object TrafficLightRootStateId : SimpleStateId
+
+sealed class TrafficLightStateId : SimpleStateId {
     object RED : TrafficLightStateId()
     object YELLOW : TrafficLightStateId()
     object GREEN : TrafficLightStateId()
 }
 
-sealed class TrafficLightEvent : Event {
+sealed class TrafficLightEvent {
     object TIMER : TrafficLightEvent()
     object SHORT_TIMER : TrafficLightEvent()
-}
-
-sealed class PedestrianLightStateId : StateId {
-    object WALK : PedestrianLightStateId()
-    object WAIT : PedestrianLightStateId()
 }
 ```
 
 ### Transition between states
 
 ```kotlin
-val machine = createMachine {
-    initial(RED)
+val machine = createMachine(
+    id = TrafficLightRootStateId,
+    initial = RED
+) {
     state(RED) {
         transition(on = TIMER, target = GREEN)
     }
@@ -42,6 +41,8 @@ machine.send(TIMER)
 
 assertEquals(GREEN, machine.currentStateId)
 ```
+
+## WIP
 
 ### Transition between nested states
 
