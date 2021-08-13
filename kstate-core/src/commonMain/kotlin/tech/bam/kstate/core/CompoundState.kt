@@ -26,6 +26,17 @@ interface CompoundStateBuilder<C, PC> : CompoundState<C, PC> {
         addState(newState)
     }
 
+    fun parallelState(
+        id: StateId<Any>,
+        init: ParallelStateBuilder<Any, C>.() -> Unit
+    ) {
+        val newState = ParallelStateBuilder<Any, C>(
+            id = id,
+            context = Unit,
+        ).apply(init).build()
+        addState(newState)
+    }
+
     fun addState(state: State<*, C>) {
         if (states.find { it.id == state.id } != null) {
             throw AlreadyRegisteredStateId(state.id)

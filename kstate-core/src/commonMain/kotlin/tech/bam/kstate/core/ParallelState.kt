@@ -18,14 +18,18 @@ open class ParallelState<C, PC>(id: StateId<C>, context: C) :
     }
 
     override fun send(event: Any): Boolean {
-        return states.any {
+        return states.map {
             if (it is CompoundState<*, *>) {
                 // TODO: Secure this unchecked cast.
                 @Suppress("UNCHECKED_CAST")
-                return (it as CompoundState<*, C>).send(event)
+                (it as CompoundState<*, C>).send(event)
             }
-            return false
-        }
+            false
+        }.any()
+    }
+
+    override fun activeStateIds(): List<StateId<*>> {
+        return listOf(id) + states.map { it.activeStateIds() }.flatten()
     }
 }
 
@@ -49,6 +53,6 @@ class ParallelStateBuilder<C, PC>(id: StateId<C>, context: C) :
         val newState = StateBuilder<Any, C>(id, Unit).apply(init).build()
         addState(newState)
     }
-    
+
     fun build(): ParallelState<C, PC> = this
 }

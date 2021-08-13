@@ -22,3 +22,20 @@ fun createMachine(
     context = Unit,
     initialStateId = initial
 ).apply(init).build()
+
+fun <Context> createParallelMachine(
+    id: StateId<Context>,
+    context: Context,
+    init: ParallelStateBuilder<Context, Unit>.() -> Unit
+) = ParallelStateBuilder<Context, Unit>(
+    id = id,
+    context = context
+).apply(init).build()
+
+fun createParallelMachine(
+    id: StateId<Any>,
+    init: ParallelStateBuilder<Any, Unit>.() -> Unit
+) = ParallelStateBuilder<Any, Unit>(
+    id = id,
+    context = Unit
+).apply(init).build()
