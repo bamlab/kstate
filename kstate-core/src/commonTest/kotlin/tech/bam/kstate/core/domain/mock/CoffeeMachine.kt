@@ -19,5 +19,5 @@ sealed class CoffeeMachineStateId : SimpleStateId {
 sealed class CoffeeMachineEvent {
     object POWER_ON : CoffeeMachineEvent()
     object POWER_OFF : CoffeeMachineEvent()
-    class SERVE_COFFEE(private val coffeeAmount: Int) : CoffeeMachineEvent()
+    class SERVE_COFFEE(val coffeeAmount: Int) : CoffeeMachineEvent()
 }

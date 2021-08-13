@@ -26,6 +26,20 @@ interface CompoundStateBuilder<C, PC> : CompoundState<C, PC> {
         addState(newState)
     }
 
+    fun <Context> state(
+        id: StateId<Context>,
+        context: Context,
+        initial: StateId<*>,
+        init: HierarchicalStateBuilder<Context, C>.() -> Unit
+    ) {
+        val newState = HierarchicalStateBuilder<Context, C>(
+            id = id,
+            context = context,
+            initialStateId = initial
+        ).apply(init).build()
+        addState(newState)
+    }
+
     fun parallelState(
         id: StateId<Any>,
         init: ParallelStateBuilder<Any, C>.() -> Unit
@@ -33,6 +47,18 @@ interface CompoundStateBuilder<C, PC> : CompoundState<C, PC> {
         val newState = ParallelStateBuilder<Any, C>(
             id = id,
             context = Unit,
+        ).apply(init).build()
+        addState(newState)
+    }
+
+    fun <Context> parallelState(
+        id: StateId<Context>,
+        context: Context,
+        init: ParallelStateBuilder<Context, C>.() -> Unit
+    ) {
+        val newState = ParallelStateBuilder<Context, C>(
+            id = id,
+            context = context,
         ).apply(init).build()
         addState(newState)
     }

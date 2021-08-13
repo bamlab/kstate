@@ -89,7 +89,7 @@ interface IStateBuilder<C, PC> : Transitionable<PC> {
     fun <E : Any, TargetContext> transition(
         on: E,
         target: StateId<TargetContext>,
-        effect: ((context: PC) -> TargetContext)? = null
+        effect: (() -> TargetContext)? = null
     ) {
         val newTransition = if (effect == null) Transition<TargetContext, PC, E>(
             event = on,
@@ -97,7 +97,23 @@ interface IStateBuilder<C, PC> : Transitionable<PC> {
         ) else Transition(
             event = on,
             target = target,
-            effect = { _, context -> effect(context) }
+            effect = { _, _ -> effect() }
+        )
+        transitions = transitions.toMutableSet().also { it.add(newTransition) }
+    }
+
+    fun <E : Any, TargetContext> transition(
+        on: KClass<E>,
+        target: StateId<TargetContext>,
+        effect: ((event: E) -> TargetContext)? = null
+    ) {
+        val newTransition = if (effect == null) Transition<TargetContext, PC, E>(
+            eventClass = on,
+            target = target,
+        ) else Transition(
+            eventClass = on,
+            target = target,
+            effect = { event, _ -> effect(event) }
         )
         transitions = transitions.toMutableSet().also { it.add(newTransition) }
     }
