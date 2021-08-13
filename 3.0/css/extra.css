@@ -1,0 +1,10 @@
+/* Header logo Width */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  width: auto;
+}
+
+/*  */
+:root > * {
+  --md-typeset-mark-color: rgb(255 255 0 / 50%);
+}
