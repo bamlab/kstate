@@ -45,11 +45,14 @@ extra:
       link: https://www.linkedin.com/company/bam.tech
     - icon: bam/logo
       link: https://www.bam.tech
+  version:
+    provider: mike
 copyright: Copyright &copy; 2020 - 2021 BAM
 google_analytics:
   - G-L6ZNQW694P
   - auto
 plugins:
+  - social
   - search
   - git-revision-date-localized
 

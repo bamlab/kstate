@@ -19,3 +19,6 @@ build
 
 # Draft files
 draft
+
+# Mkdocs
+.cache
