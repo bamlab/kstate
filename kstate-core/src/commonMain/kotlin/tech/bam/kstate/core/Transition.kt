@@ -1,7 +1,6 @@
 package tech.bam.kstate.core
 
 import tech.bam.kstate.core.domain.types.StateId
-import tech.bam.kstate.core.domain.types.TransitionType
 import kotlin.reflect.KClass
 
 /**
@@ -18,8 +17,6 @@ open class Transition<TC, C, E : Any>(
     effect: ((event: E, context: C) -> TC)? = null,
     val cond: ((context: C) -> Boolean)? = null,
     val isAlways: Boolean = false,
-    // TODO : Implement this
-    val type: TransitionType = TransitionType.Internal
 ) {
     var event: E? = null
         private set

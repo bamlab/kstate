@@ -7,7 +7,7 @@ open class HierarchicalState<C, PC>(id: StateId<C>, val initialStateId: StateId<
     State<C, PC>(id, context),
     CompoundState<C, PC> {
     override var states: List<State<*, C>> = listOf()
-    var currentStateId: StateId<*>? = null
+    private var currentStateId: StateId<*>? = null
 
     fun currentState(): State<*, C> {
         val currentState = states.find { it.id == currentStateId }

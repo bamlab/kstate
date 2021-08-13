@@ -45,7 +45,7 @@ open class State<C, PC>(
      * Call this function to find a matching transition for the given event.
      *
      * @param event the event sent to the state.
-     * @return a transition or [null] if nothing is found.
+     * @return a transition or `null` if nothing is found.
      */
     fun <E : Any> findTransitionOn(event: E, context: PC): Transition<*, PC, E>? {
         // TODO: Secure this unchecked cast.
