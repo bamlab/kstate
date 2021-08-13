@@ -78,7 +78,7 @@
       
         <meta  property="og:description"  content="None" >
       
-        <meta  property="og:image"  content="assets/images/social/guides/parallel-states.png" >
+        <meta  property="og:image"  content="assets/images/social/guides/parallel-state.png" >
       
         <meta  property="og:image:type"  content="image/png" >
       
@@ -94,7 +94,7 @@
       
         <meta  name="twitter:description"  content="None" >
       
-        <meta  name="twitter:image"  content="assets/images/social/guides/parallel-states.png" >
+        <meta  name="twitter:image"  content="assets/images/social/guides/parallel-state.png" >
       
     
     
@@ -272,13 +272,15 @@
         
   
   
+    
+  
 
 
   
   
   
     <li class="md-tabs__item">
-      <a href="../getting-started/" class="md-tabs__link">
+      <a href="../getting-started/" class="md-tabs__link md-tabs__link--active">
         Guides
       </a>
     </li>
@@ -374,12 +376,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
       
       
@@ -486,11 +490,21 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../parallel-state.md" class="md-nav__link">
-        None
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Parallel States
       </a>
+      
     </li>
   
 
@@ -575,7 +589,7 @@
             <article class="md-content__inner md-typeset">
               
                 
-                  <a href="https://github.com/bamlab/kstate/edit/master/docs/guides/parallel-states.md" title="Edit this page" class="md-content__button md-icon">
+                  <a href="https://github.com/bamlab/kstate/edit/master/docs/guides/parallel-state.md" title="Edit this page" class="md-content__button md-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
                   </a>
                 
@@ -617,6 +631,41 @@
       
         
 <footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../hierarchical-state/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Hierarchical State" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Hierarchical State
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../context/" class="md-footer__link md-footer__link--next" aria-label="Next: Context" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Context
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
